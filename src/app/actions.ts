@@ -7,6 +7,7 @@ import { z } from "zod";
 import { db, schema } from "@/db";
 import { COMPONENT_KEYS } from "@/config/scoring";
 import { funderDetail, type FunderDetail } from "@/lib/queries";
+import { requireUser } from "@/lib/auth/session";
 
 export type ActionResult = { ok: true } | { ok: false; error: string };
 
@@ -20,6 +21,7 @@ const decisionSchema = z.object({
 
 /** Approve → pipeline prospect; snooze → hidden for settings.snoozeDays; reject → hidden next refresh. */
 export async function decide(input: z.infer<typeof decisionSchema>): Promise<ActionResult> {
+  await requireUser();
   const parsed = decisionSchema.safeParse(input);
   if (!parsed.success) return fail("Invalid decision");
   const { funderId, opportunityId, action } = parsed.data;
@@ -63,6 +65,7 @@ export async function decide(input: z.infer<typeof decisionSchema>): Promise<Act
  * before it was saved (for example "In your pipeline") comes back.
  */
 export async function unsaveFunder(funderId: number): Promise<ActionResult> {
+  await requireUser();
   if (!Number.isInteger(funderId) || funderId <= 0) return fail("Invalid funder");
   try {
     await db.delete(schema.decisions).where(and(eq(schema.decisions.funderId, funderId), eq(schema.decisions.action, "snooze")));
@@ -76,6 +79,7 @@ export async function unsaveFunder(funderId: number): Promise<ActionResult> {
 }
 
 export async function loadFunderDetail(funderId: number): Promise<FunderDetail | null> {
+  await requireUser();
   if (!Number.isInteger(funderId) || funderId <= 0) return null;
   return funderDetail(funderId);
 }
@@ -86,6 +90,7 @@ const stageSchema = z.object({
 });
 
 export async function moveStage(input: z.infer<typeof stageSchema>): Promise<ActionResult> {
+  await requireUser();
   const parsed = stageSchema.safeParse(input);
   if (!parsed.success) return fail("Invalid stage");
   const { id, stage } = parsed.data;
@@ -107,6 +112,7 @@ const money = z.preprocess(
 const amountsSchema = z.object({ id: z.number().int().positive(), amountAsked: money, amountAwarded: money });
 
 export async function updateAmounts(input: { id: number; amountAsked: unknown; amountAwarded: unknown }): Promise<ActionResult> {
+  await requireUser();
   const parsed = amountsSchema.safeParse(input);
   if (!parsed.success) return fail("Amounts must be positive numbers");
   const { id, amountAsked, amountAwarded } = parsed.data;
@@ -123,6 +129,7 @@ const paymentSchema = z.object({
 });
 
 export async function addPayment(input: z.infer<typeof paymentSchema>): Promise<ActionResult> {
+  await requireUser();
   const parsed = paymentSchema.safeParse(input);
   if (!parsed.success) return fail("Enter an amount and a date");
   await db.insert(schema.payments).values(parsed.data);
@@ -132,6 +139,7 @@ export async function addPayment(input: z.infer<typeof paymentSchema>): Promise<
 }
 
 export async function markNotificationsRead(ids?: number[]): Promise<ActionResult> {
+  await requireUser();
   const now = new Date();
   if (ids?.length) {
     for (const id of ids.filter(Number.isInteger)) {
@@ -153,6 +161,7 @@ const settingsSchema = z.object({
 });
 
 export async function saveSettings(input: z.infer<typeof settingsSchema>): Promise<ActionResult> {
+  await requireUser();
   const parsed = settingsSchema.safeParse(input);
   if (!parsed.success) return fail(parsed.error.issues[0]?.message ?? "Invalid settings");
   const v = parsed.data;
@@ -168,6 +177,7 @@ const weightsSchema = z.object(Object.fromEntries(COMPONENT_KEYS.map((k) => [k, 
 
 /** Weight tuning (flagged): saves weights, then re-scores without any AI calls. */
 export async function saveWeights(weights: Record<string, number> | null): Promise<ActionResult> {
+  await requireUser();
   if (weights !== null && !weightsSchema.safeParse(weights).success) return fail("Weights must be between 0 and 1");
   await db
     .insert(schema.settings)
@@ -181,6 +191,7 @@ export async function saveWeights(weights: Record<string, number> | null): Promi
 }
 
 export async function clearSampleData(): Promise<ActionResult> {
+  await requireUser();
   await db.delete(schema.pipelineItems).where(eq(schema.pipelineItems.isSample, true));
   revalidatePath("/pipeline");
   revalidatePath("/dashboard");
@@ -188,6 +199,7 @@ export async function clearSampleData(): Promise<ActionResult> {
 }
 
 export async function refreshNow(): Promise<ActionResult> {
+  await requireUser();
   try {
     const { runRefresh } = await import("@/lib/pipeline/refresh");
     await runRefresh({ force: true });
