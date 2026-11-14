@@ -26,6 +26,26 @@ npm run dev                       # terminal 2: http://localhost:3000
 
 Prefer Docker? `docker compose up -d` also serves Postgres on :5433 with the same credentials.
 
+## Authentication and approvals
+
+Everyone signs in. There is **no public sign-up**: admins create accounts.
+
+1. Set `BETTER_AUTH_SECRET` (`openssl rand -base64 32`) and `BETTER_AUTH_URL` in `.env.local` (and in Vercel).
+2. `npm run db:push`. This only adds tables: `auth_*`, `content_reviews`, `review_events`, plus a nullable `drafts.created_by`. The SQL is in [`docs/migrations/2026-11-14-auth-approvals.sql`](docs/migrations/2026-11-14-auth-approvals.sql).
+3. Create the first admin. The password is prompted for, or read from `ADMIN_PASSWORD`, so it never goes on the command line:
+   ```bash
+   npm run auth:create-admin -- --email you@tech-moms.org --name "Your Name"
+   ```
+4. Sign in, then add teammates under **Team access** (admins only).
+
+Roles: **Admin** approves AI content and manages the team. **Staff** generates, edits and submits drafts and sees the decisions. Every page, server action and API route checks the session on the server (`src/proxy.ts`, `src/lib/auth/session.ts`). `/api/cron/*` still uses `CRON_SECRET`, so scheduled refreshes keep working with no user session.
+
+Password reset emails go through Resend (`RESEND_API_KEY`). Without a key in local dev, the reset link is printed to the server console. In production nothing is sent.
+
+**Human approval:** after saving an AI outreach draft, choose **Submit for approval**. Admins review it under **Approvals**: approve, request changes (note required) or reject (note required). Each decision records the reviewer, the time and a hash of the exact text. Any material edit clears the approval. Approval never sends anything. "Open approved draft in email" only appears for approved, unchanged text, asks for confirmation first, and the person still presses Send in their own mail app.
+
+Run the approval database tests against a local DB (never production): `TEST_DATABASE_URL=postgres://… npx vitest run src/lib/approvals`.
+
 ## Data pipeline (local, heavy)
 
 ```bash
