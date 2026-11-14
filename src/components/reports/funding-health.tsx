@@ -1,11 +1,12 @@
 import { SingleBars } from "@/components/dashboard/charts";
 import { CalendarIcon, CheckIcon, ClockIcon, CoinsIcon, PipelineIcon } from "@/components/icons";
-import { Pill, StatCard, typeLabel, usd } from "@/components/ui";
+import { Pill, typeLabel, usd } from "@/components/ui";
 import { isEnabled } from "@/config/flags";
 import { distinctByMonth, fundingMix, giftRanges, winRateByType } from "@/lib/dashboard-model";
 import { paymentRows, pipelineCards, upcomingDeadlines } from "@/lib/pipeline-queries";
 import { applicationsDueSoon, awardedVsReceivedByMonth, collectionTracker, DUE_SOON_DAYS, fundingKpis, hasSampleData, money, NOT_RECORDED, pipelineGlance } from "@/lib/reports-model";
 import { reportData } from "@/lib/reports-queries";
+import { KpiCard, KpiGrid } from "./kpi-card";
 import { Panel, SampleNote } from "./panel";
 import { FundingMovementChart, PipelineGlanceChart } from "./report-charts";
 
@@ -35,13 +36,13 @@ export async function FundingHealth() {
     <div className="space-y-6">
       <SampleNote show={sample} />
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
-        <StatCard label="Committed / Awarded Funding" value={kpiMoney(kpis.committed)} hint="amount awarded, Awarded stage" icon={<CheckIcon />} tone="teal" />
-        <StatCard label="Cash Received" value={usd(kpis.cashReceived)} hint="payments on awarded items" icon={<CoinsIcon />} tone="rose" />
-        <StatCard label="Still to Receive" value={kpiMoney(kpis.stillToReceive)} hint="balance left on each award" icon={<ClockIcon />} tone="plum" />
-        <StatCard label="Active Funding Requests" value={kpiMoney(kpis.activeRequests)} hint="asked, in LOI and Submitted" icon={<PipelineIcon />} tone="teal" />
-        <StatCard label="Applications Due Soon" value={applicationsDueSoon(items, openCalls, today)} hint={`application deadlines, next ${DUE_SOON_DAYS} days`} icon={<CalendarIcon />} tone="rose" />
-      </div>
+      <KpiGrid count={5}>
+        <KpiCard label="Committed / Awarded Funding" value={kpiMoney(kpis.committed)} hint="amount awarded, Awarded stage" icon={<CheckIcon />} tone="teal" />
+        <KpiCard label="Cash Received" value={usd(kpis.cashReceived)} hint="payments on awarded items" icon={<CoinsIcon />} tone="rose" />
+        <KpiCard label="Still to Receive" value={kpiMoney(kpis.stillToReceive)} hint="balance left on each award" icon={<ClockIcon />} tone="plum" />
+        <KpiCard label="Active Funding Requests" value={kpiMoney(kpis.activeRequests)} hint="asked, in LOI and Submitted" icon={<PipelineIcon />} tone="teal" />
+        <KpiCard label="Applications Due Soon" value={applicationsDueSoon(items, openCalls, today)} hint={`application deadlines, next ${DUE_SOON_DAYS} days`} icon={<CalendarIcon />} tone="rose" />
+      </KpiGrid>
 
       {checks.length > 0 && (
         <div role="note" className="rounded-[16px] border border-line bg-card p-4 text-sm text-plum">
