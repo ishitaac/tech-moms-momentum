@@ -7,7 +7,6 @@
  */
 import { eq } from "drizzle-orm";
 import { db, schema } from "../src/db";
-import type { Purpose, PurposeGoals } from "../src/lib/purposes";
 
 const CORPORATE_SEEDS = [
   { name: "Adobe", website: "https://www.adobe.com/corporate-responsibility.html" },
@@ -16,21 +15,13 @@ const CORPORATE_SEEDS = [
   { name: "Ancestry", website: "https://www.ancestry.com/corporate/" },
 ] as const;
 
-/**
- * Sample pipeline: [seed index, stage, asked, awarded, payments [amount, yyyy-mm-dd][], purpose, deadline in N days from today].
- * Some awarded money is still outstanding, and two deadlines fall inside the next 30 days, so the demo shows real-looking numbers.
- */
-const SAMPLE_PIPELINE: [number, typeof schema.stage.enumValues[number], number, number | null, [number, string][], Purpose, number | null][] = [
-  [0, "awarded", 25_000, 25_000, [[12_500, "2026-07-15"], [6_250, "2026-10-15"]], "technology", null],
-  [1, "awarded", 30_000, 20_000, [[10_000, "2026-09-01"]], "scholarships", null],
-  [2, "submitted", 10_000, null, [], "childcare", 12],
-  [3, "loi", 15_000, null, [], "trainers_tas", 25],
+/** Sample pipeline: [seed index, stage, asked, awarded, payments [amount, yyyy-mm-dd][]]. */
+const SAMPLE_PIPELINE: [number, typeof schema.stage.enumValues[number], number, number | null, [number, string][]][] = [
+  [0, "awarded", 25_000, 25_000, [[12_500, "2026-07-15"], [12_500, "2026-10-15"]]],
+  [1, "awarded", 30_000, 20_000, [[20_000, "2026-09-01"]]],
+  [2, "submitted", 10_000, null, []],
+  [3, "loi", 15_000, null, []],
 ];
-
-const isoInDays = (days: number) => new Date(Date.now() + days * 86_400_000).toISOString().slice(0, 10);
-
-/** Placeholder annual goals, only written when none exist, and flagged SAMPLE until the user saves their own. */
-const SAMPLE_GOALS: PurposeGoals = { trainers_tas: 40_000, scholarships: 60_000, childcare: 30_000, technology: 35_000 };
 
 async function upsertSeedFunder(name: string, website: string): Promise<number> {
   const [existing] = await db.select({ id: schema.funders.id }).from(schema.funders).where(eq(schema.funders.name, name)).limit(1);
@@ -50,7 +41,7 @@ async function main() {
   console.log(`Corporate seeds: ${seedIds.length}`);
 
   await db.delete(schema.pipelineItems).where(eq(schema.pipelineItems.isSample, true));
-  for (const [idx, stage, asked, awarded, pays, purpose, dueInDays] of SAMPLE_PIPELINE) {
+  for (const [idx, stage, asked, awarded, pays] of SAMPLE_PIPELINE) {
     const [item] = await db
       .insert(schema.pipelineItems)
       .values({
@@ -59,8 +50,6 @@ async function main() {
         amountAsked: asked,
         amountAwarded: awarded,
         awardedOn: awarded ? (pays[0]?.[1] ?? null) : null,
-        purpose,
-        deadline: dueInDays === null ? null : isoInDays(dueInDays),
         isSample: true,
         notes: "Sample data for the demo",
       })
@@ -70,12 +59,6 @@ async function main() {
     }
   }
   console.log(`Sample pipeline items: ${SAMPLE_PIPELINE.length}`);
-
-  const [settings] = await db.select({ goals: schema.settings.purposeGoals }).from(schema.settings).where(eq(schema.settings.id, 1));
-  if (Object.keys(settings?.goals ?? {}).length === 0) {
-    await db.update(schema.settings).set({ purposeGoals: SAMPLE_GOALS, purposeGoalsSample: true }).where(eq(schema.settings.id, 1));
-    console.log("Sample funding goals written (flagged SAMPLE).");
-  }
   process.exit(0);
 }
 

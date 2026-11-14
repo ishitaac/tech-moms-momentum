@@ -17,7 +17,7 @@ const moneyFull = (n: number) => `$${Math.round(n).toLocaleString("en-US")}`;
 const axisProps = { tick: { fill: CHART.axis, fontSize: 12 }, axisLine: false, tickLine: false } as const;
 const RADIUS: [number, number, number, number] = [4, 4, 0, 0];
 
-export function TableView({ headers, rows }: { headers: string[]; rows: (string | number)[][] }) {
+function TableView({ headers, rows }: { headers: string[]; rows: (string | number)[][] }) {
   return (
     <details className="mt-3 text-xs text-muted">
       <summary className="cursor-pointer rounded-full px-3 py-1.5 font-medium text-plum hover:bg-plum-tint">Show as table</summary>

@@ -7,7 +7,6 @@ import { isEnabled } from "@/config/flags";
 import { DEFAULT_WEIGHTS } from "@/config/scoring";
 import { UTAH_SOURCES } from "@/config/utah-sources";
 import { isAiConfigured, modelId } from "@/lib/ai/provider";
-import { GoalsForm } from "@/components/settings/goals-form";
 import { SettingsForm } from "@/components/settings/settings-form";
 import { RefreshButton, ClearSampleButton } from "@/components/settings/settings-actions";
 import { WeightSliders } from "@/components/settings/weight-sliders";
@@ -54,10 +53,6 @@ async function Settings() {
             snoozeDays: settings?.snoozeDays ?? 30,
           }}
         />
-      </Panel>
-
-      <Panel title="Annual funding goals" id="goals">
-        <GoalsForm initial={settings?.purposeGoals ?? {}} isSample={settings?.purposeGoalsSample ?? false} />
       </Panel>
 
       <Panel title="Refresh">
