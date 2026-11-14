@@ -4,8 +4,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { BellIcon, BookmarkIcon, CloseIcon, DashboardIcon, FundersIcon, MenuIcon, PipelineIcon, SettingsIcon } from "./icons";
+import { ROLE_LABELS, type Role } from "@/lib/auth/roles";
+import { BellIcon, BookmarkIcon, CloseIcon, DashboardIcon, ExternalIcon, FundersIcon, MenuIcon, PipelineIcon, SettingsIcon, ShieldCheckIcon } from "./icons";
+import { SignOutButton } from "./sign-out-button";
 import { ThemeToggle } from "./theme-toggle";
+
+export const TECH_MOMS_WEBSITE = "https://www.tech-moms.org/";
 
 const GROUPS = [
   { title: "Discover", links: [{ href: "/", label: "Funders", Icon: FundersIcon }] },
@@ -14,6 +18,7 @@ const GROUPS = [
     links: [
       { href: "/pipeline", label: "Pipeline", Icon: PipelineIcon },
       { href: "/saved", label: "Saved for Later", Icon: BookmarkIcon },
+      { href: "/approvals", label: "Approvals", Icon: ShieldCheckIcon },
       { href: "/dashboard", label: "Reports", Icon: DashboardIcon },
     ],
   },
@@ -27,7 +32,15 @@ const GROUPS = [
 ];
 
 /** Left sidebar on desktop; on phones a top bar with a menu button that opens the same list. */
-export function Sidebar({ unread }: { unread: number }) {
+export function Sidebar({
+  unread,
+  pendingApprovals,
+  user,
+}: {
+  unread: number;
+  pendingApprovals: number;
+  user: { name: string; email: string; role: Role };
+}) {
   const path = usePathname();
   // Menu is "open for this path": navigating to another page closes it without an effect.
   const [openFor, setOpenFor] = useState<string | null>(null);
@@ -64,7 +77,7 @@ export function Sidebar({ unread }: { unread: number }) {
       {open && <button type="button" aria-label="Close menu" className="fixed inset-0 z-30 bg-plum/30 lg:hidden" onClick={() => setOpenFor(null)} />}
 
       <aside
-        className={`fixed inset-y-0 left-0 z-40 w-64 flex-col border-r border-line bg-card px-4 py-6 lg:sticky lg:top-0 lg:z-auto lg:flex lg:h-screen lg:shrink-0 ${open ? "flex" : "hidden"}`}
+        className={`fixed inset-y-0 left-0 z-40 w-64 flex-col border-r border-line bg-card px-4 py-6 lg:sticky lg:top-0 lg:z-auto lg:flex lg:h-screen lg:shrink-0 overflow-y-auto ${open ? "flex" : "hidden"}`}
       >
         <Link href="/" className="mb-8 hidden items-center gap-3 px-4 lg:flex">
           <Image src="/tech-moms-logo.png" alt="Tech-Moms" width={88} height={52} priority />
@@ -95,6 +108,14 @@ export function Sidebar({ unread }: { unread: number }) {
                           {unread}
                         </span>
                       )}
+                      {href === "/approvals" && pendingApprovals > 0 && (
+                        <span
+                          className={`rounded-full px-2 py-0.5 text-xs font-semibold ${active ? "bg-white text-plum" : "border border-rose bg-rose-tint text-plum"}`}
+                          aria-label={`${pendingApprovals} waiting for your review`}
+                        >
+                          {pendingApprovals}
+                        </span>
+                      )}
                     </Link>
                   );
                 })}
@@ -102,7 +123,26 @@ export function Sidebar({ unread }: { unread: number }) {
             </div>
           ))}
         </nav>
-        <div className="mt-auto space-y-3">
+        <a
+          href={TECH_MOMS_WEBSITE}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-6 flex items-center gap-3 rounded-full border border-plum/30 px-4 py-2.5 text-[15px] font-medium text-plum transition-colors hover:bg-plum-tint focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-plum"
+        >
+          <ExternalIcon className="h-5 w-5 shrink-0" />
+          <span className="flex-1">Visit Tech-Moms Website</span>
+          <span className="sr-only">(opens in a new tab)</span>
+        </a>
+        <div className="mt-auto space-y-3 pt-6">
+          <div className="rounded-[12px] border border-line px-4 py-3">
+            <p className="truncate text-sm font-semibold text-plum" title={user.email}>
+              {user.name}
+            </p>
+            <p className="truncate text-xs text-muted">
+              {ROLE_LABELS[user.role]} · {user.email}
+            </p>
+            <SignOutButton />
+          </div>
           <ThemeToggle />
           <p className="px-4 text-xs leading-relaxed text-muted">Built from public information. You make every decision.</p>
         </div>
