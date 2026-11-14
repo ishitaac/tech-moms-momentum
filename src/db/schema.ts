@@ -10,7 +10,6 @@ import {
   text,
   timestamp,
 } from "drizzle-orm/pg-core";
-import { PURPOSES, type PurposeGoals } from "../lib/purposes";
 
 export const funderType = pgEnum("funder_type", [
   "state",
@@ -25,8 +24,6 @@ export const route = pgEnum("route", ["loi", "direct", "unknown"]);
 export const decisionAction = pgEnum("decision_action", ["approve", "snooze", "reject"]);
 export const stage = pgEnum("stage", ["prospect", "loi", "submitted", "awarded", "declined"]);
 export const notificationKind = pgEnum("notification_kind", ["new_match", "open_call", "deadline"]);
-
-export const purpose = pgEnum("purpose", PURPOSES);
 
 const money = (name: string) => numeric(name, { precision: 14, scale: 2, mode: "number" });
 const createdAt = () => timestamp("created_at", { withTimezone: true }).defaultNow().notNull();
@@ -136,8 +133,6 @@ export const pipelineItems = pgTable("pipeline_items", {
   amountAwarded: money("amount_awarded"),
   deadline: date("deadline"),
   awardedOn: date("awarded_on"),
-  /** What the money is for; drives Reporting > Funding by Purpose. */
-  purpose: purpose("purpose"),
   notes: text("notes"),
   /** Demo sample data (PRD: no CRM yet). Shown with a "Sample" badge; clearable in Settings. */
   isSample: boolean("is_sample").default(false).notNull(),
@@ -198,10 +193,6 @@ export const settings = pgTable("settings", {
   tokenCapPerRefresh: integer("token_cap_per_refresh").default(2_000_000).notNull(),
   weights: jsonb("weights").$type<Record<string, number> | null>(),
   trustBannerDismissed: boolean("trust_banner_dismissed").default(false).notNull(),
-  /** Annual funding goal per purpose (dollars). Still Needed = goal minus awarded. */
-  purposeGoals: jsonb("purpose_goals").$type<PurposeGoals>().default({}).notNull(),
-  /** True while the goals are the seeded placeholders; cleared when the user saves their own. */
-  purposeGoalsSample: boolean("purpose_goals_sample").default(false).notNull(),
 });
 
 export const drafts = pgTable("drafts", {

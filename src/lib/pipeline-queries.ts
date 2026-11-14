@@ -32,8 +32,6 @@ export async function pipelineCards(): Promise<(PipelineCard & { awardedOn: stri
     received: receivedBy.get(p.id) ?? 0,
     deadline: p.deadline ?? o?.deadline ?? null,
     isSample: p.isSample,
-    purpose: p.purpose,
-    opportunityId: p.opportunityId,
   }));
 }
 
