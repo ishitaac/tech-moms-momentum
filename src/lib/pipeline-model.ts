@@ -1,4 +1,5 @@
 /** Pure pipeline types and helpers — safe to import from client components. */
+import type { Purpose } from "./purposes";
 
 export const STAGES = ["prospect", "loi", "submitted", "awarded", "declined"] as const;
 export type Stage = (typeof STAGES)[number];
@@ -22,6 +23,9 @@ export interface PipelineCard {
   received: number;
   deadline: string | null;
   isSample: boolean;
+  /** What the money is for. Optional so older callers and tests keep working. */
+  purpose?: Purpose | null;
+  opportunityId?: number | null;
 }
 
 export interface PaymentRow {

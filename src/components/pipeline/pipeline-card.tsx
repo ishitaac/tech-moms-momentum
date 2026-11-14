@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import { addPayment, updateAmounts } from "@/app/actions";
 import { GripIcon } from "@/components/icons";
 import { STAGES, type PipelineCard, type Stage } from "@/lib/pipeline-model";
+import { isPurpose, PURPOSES, PURPOSE_LABELS, type Purpose } from "@/lib/purposes";
 import { shortDate, typeLabel, usd } from "@/components/ui";
 import { NEXT_ACTION, STAGE_NAME } from "./stage-names";
 
@@ -33,6 +34,7 @@ export function PipelineCardView({ card, onStageChange, onChange }: Props) {
   const [pos, setPos] = useState<{ top: number; left: number }>({ top: 0, left: 0 });
   const [asked, setAsked] = useState(card.amountAsked?.toString() ?? "");
   const [awarded, setAwarded] = useState(card.amountAwarded?.toString() ?? "");
+  const [purpose, setPurpose] = useState<Purpose | "">(card.purpose ?? "");
   const [payAmount, setPayAmount] = useState("");
   const [payDate, setPayDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [error, setError] = useState<string | null>(null);
@@ -81,11 +83,11 @@ export function PipelineCardView({ card, onStageChange, onChange }: Props) {
 
   const save = () =>
     start(async () => {
-      const r = await updateAmounts({ id: card.id, amountAsked: asked, amountAwarded: awarded });
+      const r = await updateAmounts({ id: card.id, amountAsked: asked, amountAwarded: awarded, purpose: purpose || null });
       if (!r.ok) return setError(r.error);
       setError(null);
       closePopover();
-      onChange({ ...card, amountAsked: asked ? Number(asked) : null, amountAwarded: awarded ? Number(awarded) : null });
+      onChange({ ...card, amountAsked: asked ? Number(asked) : null, amountAwarded: awarded ? Number(awarded) : null, purpose: purpose || null });
     });
 
   const recordPayment = () =>
@@ -206,6 +208,21 @@ export function PipelineCardView({ card, onStageChange, onChange }: Props) {
                 <input inputMode="decimal" value={awarded} onChange={(e) => setAwarded(e.target.value)} className={input} />
               </label>
             </div>
+            <label className="block text-meta text-muted">
+              Funding purpose
+              <select
+                value={purpose}
+                onChange={(e) => setPurpose(isPurpose(e.target.value) ? e.target.value : "")}
+                className="mt-1 w-full rounded-full border border-line bg-card px-3 py-2 text-body text-plum"
+              >
+                <option value="">Not set</option>
+                {PURPOSES.map((p) => (
+                  <option key={p} value={p}>
+                    {PURPOSE_LABELS[p]}
+                  </option>
+                ))}
+              </select>
+            </label>
             <button type="button" disabled={pending} onClick={save} className="w-full rounded-full bg-plum px-3 py-2 text-body font-semibold text-white hover:bg-plum/90 disabled:opacity-60">
               Save amounts
             </button>
