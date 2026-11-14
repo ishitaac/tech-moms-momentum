@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import { PageHeader } from "@/components/ui";
+import { ActionCenter } from "@/components/reports/action-center";
 import { FundingHealth } from "@/components/reports/funding-health";
 import { Panel } from "@/components/reports/panel";
 import { ReportTabs } from "@/components/reports/tabs";
@@ -19,11 +20,7 @@ async function ReportsBody({ searchParams }: Pick<PageProps<"/dashboard">, "sear
           <p className="py-6 text-center text-sm text-muted">Coming in a later step.</p>
         </Panel>
       )}
-      {tab === "action-center" && (
-        <Panel title="Action Center">
-          <p className="py-6 text-center text-sm text-muted">Coming in a later step.</p>
-        </Panel>
-      )}
+      {tab === "action-center" && <ActionCenter />}
     </>
   );
 }
