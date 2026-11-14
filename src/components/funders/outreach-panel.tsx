@@ -18,7 +18,7 @@ interface Props {
   opportunityId: number | null;
 }
 
-const inputClass = "w-full rounded-[12px] border border-line bg-card p-2 text-sm";
+const inputClass = "w-full rounded-[12px] border border-control bg-card p-2 text-sm";
 const labelClass = "mb-1 block text-xs font-semibold text-plum";
 const secondaryButton =
   "rounded-full border border-plum/30 bg-card px-3 py-1.5 text-sm font-semibold text-plum hover:bg-rose-tint disabled:opacity-60";

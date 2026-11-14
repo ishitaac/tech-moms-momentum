@@ -23,6 +23,43 @@
 
   --radius-card: 16px;
   --shadow-card: 0 1px 2px rgb(75 29 66 / 0.04);
+
+  /* Accessibility tokens (WCAG 2.2 AA, non-text 3:1). Brand hues, darkened only where needed. */
+  --teal-strong: #1c8a90; /* teal for bars/rings/markers: 4.1:1 on white (brand teal is 2.2:1) */
+  --control-border: #8f7a88; /* form field edges: 4.0:1 on white */
+  --chart-1: #1c8a90; /* first series, solid */
+  --chart-2: #be677c; /* second series, always hatched so it never relies on hue */
+  --chart-hatch: #ffffff;
+}
+
+/*
+ * Optional high-contrast, color-blind-friendly theme. On when the user picks it (data-theme="contrast")
+ * or when the OS asks for more contrast, unless the user explicitly chose the default theme.
+ * Only token values change; components are untouched.
+ */
+:root[data-theme="contrast"] {
+  --muted: #4f3a48; /* 10:1 on white */
+  --border: #8f7a88; /* card and divider edges visible: 4.0:1 */
+  --control-border: #4f3a48;
+  --teal-logo: #00666b;
+  --teal-strong: #00666b; /* 6.8:1 */
+  --rose: #a8506a; /* 5.2:1 */
+  --chart-1: #00666b;
+  --chart-2: #a8506a;
+  --shadow-card: 0 0 0 1px #8f7a88;
+}
+@media (prefers-contrast: more) {
+  :root:not([data-theme="default"]) {
+    --muted: #4f3a48;
+    --border: #8f7a88;
+    --control-border: #4f3a48;
+    --teal-logo: #00666b;
+    --teal-strong: #00666b;
+    --rose: #a8506a;
+    --chart-1: #00666b;
+    --chart-2: #a8506a;
+    --shadow-card: 0 0 0 1px #8f7a88;
+  }
 }
 
 @theme inline {
@@ -37,6 +74,8 @@
   --color-card: var(--card);
   --color-line: var(--border);
   --color-muted: var(--muted);
+  --color-teal-strong: var(--teal-strong);
+  --color-control: var(--control-border);
 
   /* Legacy names kept so existing components keep working while they are restyled. */
   --color-ink: var(--plum);

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { BellIcon, BookmarkIcon, CloseIcon, DashboardIcon, FundersIcon, MenuIcon, PipelineIcon, SettingsIcon } from "./icons";
+import { ThemeToggle } from "./theme-toggle";
 
 const GROUPS = [
   { title: "Discover", links: [{ href: "/", label: "Funders", Icon: FundersIcon }] },
@@ -56,7 +57,7 @@ export function Sidebar({ unread }: { unread: number }) {
         >
           {open ? <CloseIcon className="h-5 w-5" /> : <MenuIcon className="h-5 w-5" />}
           Menu
-          {!open && unread > 0 && <span className="rounded-full bg-rose px-1.5 text-xs font-semibold text-plum">{unread}</span>}
+          {!open && unread > 0 && <span className="rounded-full border border-rose bg-rose-tint px-1.5 text-xs font-semibold text-plum">{unread}</span>}
         </button>
       </div>
 
@@ -88,7 +89,7 @@ export function Sidebar({ unread }: { unread: number }) {
                       <span className="flex-1">{label}</span>
                       {href === "/notifications" && unread > 0 && (
                         <span
-                          className={`rounded-full px-2 py-0.5 text-xs font-semibold ${active ? "bg-white text-plum" : "bg-rose text-plum"}`}
+                          className={`rounded-full px-2 py-0.5 text-xs font-semibold ${active ? "bg-white text-plum" : "border border-rose bg-rose-tint text-plum"}`}
                           aria-label={`${unread} unread`}
                         >
                           {unread}
@@ -101,7 +102,10 @@ export function Sidebar({ unread }: { unread: number }) {
             </div>
           ))}
         </nav>
-        <p className="mt-auto px-4 text-xs leading-relaxed text-muted">Built from public information. You make every decision.</p>
+        <div className="mt-auto space-y-3">
+          <ThemeToggle />
+          <p className="px-4 text-xs leading-relaxed text-muted">Built from public information. You make every decision.</p>
+        </div>
       </aside>
     </>
   );

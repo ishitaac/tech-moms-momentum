@@ -67,19 +67,18 @@ export function ActionButtons({ funderId, opportunityId, funderName, onResult, c
           })
         }
         className={BTN.primary}
-        aria-label={`Add ${funderName} to pipeline`}
       >
-        Add to pipeline
+        Add to pipeline<span className="sr-only">: {funderName}</span>
       </button>
       {saved ? (
-        <button type="button" disabled={pending} onClick={() => unsave(() => setSaved(false))} className={BTN.secondary} aria-label={`Remove ${funderName} from saved`}>
-          Remove from saved
+        <button type="button" disabled={pending} onClick={() => unsave(() => setSaved(false))} className={BTN.secondary}>
+          Remove from saved<span className="sr-only">: {funderName}</span>
         </button>
       ) : (
         !inPipeline &&
         !added && (
-          <button type="button" disabled={pending} onClick={() => act("snooze", () => setSaved(true))} className={BTN.secondary} aria-label={`Save ${funderName} for later`}>
-            Save for later
+          <button type="button" disabled={pending} onClick={() => act("snooze", () => setSaved(true))} className={BTN.secondary}>
+            Save for later<span className="sr-only">: {funderName}</span>
           </button>
         )
       )}

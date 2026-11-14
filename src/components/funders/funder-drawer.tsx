@@ -226,7 +226,7 @@ export function FunderDrawer({ row, onClose, showPeople, showDraft }: Props) {
                     <li key={k} className="flex items-center gap-3">
                       <span className="w-40 shrink-0 text-sm">{COMPONENT_LABELS[k]}</span>
                       <span className="h-2 flex-1 overflow-hidden rounded-full bg-plum-tint">
-                        {c.score !== null && <span className="block h-full rounded-full bg-teal" style={{ width: `${c.score * 100}%` }} />}
+                        {c.score !== null && <span className="block h-full rounded-full bg-teal-strong" style={{ width: `${c.score * 100}%` }} />}
                       </span>
                       <span className="w-16 text-right text-sm text-muted">{c.score === null ? "Unknown" : `${Math.round(c.score * 100)}%`}</span>
                     </li>

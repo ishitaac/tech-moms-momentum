@@ -17,7 +17,7 @@ export function RefreshButton() {
             setMsg(r.ok ? "Refresh complete." : r.error);
           })
         }
-        className="rounded-full bg-teal px-4 py-2 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-60"
+        className="rounded-full bg-teal px-4 py-2 text-sm font-semibold text-plum hover:opacity-90 disabled:opacity-60"
       >
         Refresh now
       </button>
