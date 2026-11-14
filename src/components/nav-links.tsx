@@ -13,7 +13,7 @@ const GROUPS = [
     links: [
       { href: "/pipeline", label: "Pipeline", Icon: PipelineIcon },
       { href: "/saved", label: "Saved for Later", Icon: BookmarkIcon },
-      { href: "/dashboard", label: "Dashboard", Icon: DashboardIcon },
+      { href: "/dashboard", label: "Reports", Icon: DashboardIcon },
     ],
   },
   {
