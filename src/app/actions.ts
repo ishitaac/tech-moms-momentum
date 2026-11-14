@@ -7,6 +7,7 @@ import { z } from "zod";
 import { db, schema } from "@/db";
 import { COMPONENT_KEYS } from "@/config/scoring";
 import { funderDetail, type FunderDetail } from "@/lib/queries";
+import { PURPOSES, type Purpose, type PurposeGoals } from "@/lib/purposes";
 
 export type ActionResult = { ok: true } | { ok: false; error: string };
 
@@ -85,13 +86,18 @@ const money = z.preprocess(
   z.number().nonnegative().max(100_000_000).nullable(),
 );
 
-const amountsSchema = z.object({ id: z.number().int().positive(), amountAsked: money, amountAwarded: money });
+const purposeField = z.enum(PURPOSES).nullable().optional();
+const amountsSchema = z.object({ id: z.number().int().positive(), amountAsked: money, amountAwarded: money, purpose: purposeField });
 
-export async function updateAmounts(input: { id: number; amountAsked: unknown; amountAwarded: unknown }): Promise<ActionResult> {
+/** `purpose` is optional: leave it out to keep the current value, or pass null to clear it. */
+export async function updateAmounts(input: { id: number; amountAsked: unknown; amountAwarded: unknown; purpose?: Purpose | null }): Promise<ActionResult> {
   const parsed = amountsSchema.safeParse(input);
   if (!parsed.success) return fail("Amounts must be positive numbers");
-  const { id, amountAsked, amountAwarded } = parsed.data;
-  await db.update(schema.pipelineItems).set({ amountAsked, amountAwarded, updatedAt: new Date() }).where(eq(schema.pipelineItems.id, id));
+  const { id, amountAsked, amountAwarded, purpose } = parsed.data;
+  await db
+    .update(schema.pipelineItems)
+    .set({ amountAsked, amountAwarded, ...(purpose !== undefined ? { purpose } : {}), updatedAt: new Date() })
+    .where(eq(schema.pipelineItems.id, id));
   revalidatePath("/pipeline");
   revalidatePath("/dashboard");
   return { ok: true };
@@ -142,6 +148,22 @@ export async function saveSettings(input: z.infer<typeof settingsSchema>): Promi
     .values({ id: 1, ...v, notifyEmail: v.notifyEmail || null })
     .onConflictDoUpdate({ target: schema.settings.id, set: { ...v, notifyEmail: v.notifyEmail || null } });
   revalidatePath("/settings");
+  return { ok: true };
+}
+
+const goalsSchema = z.object(Object.fromEntries(PURPOSES.map((p) => [p, z.number().int().min(0).max(100_000_000).optional()])));
+
+/** Saves the annual funding goal per purpose. Saving always replaces the SAMPLE placeholder goals. */
+export async function savePurposeGoals(goals: PurposeGoals): Promise<ActionResult> {
+  const parsed = goalsSchema.safeParse(goals);
+  if (!parsed.success) return fail("Goals must be whole dollar amounts from 0 to 100,000,000");
+  const purposeGoals = Object.fromEntries(Object.entries(parsed.data).filter(([, v]) => v !== undefined)) as PurposeGoals;
+  await db
+    .insert(schema.settings)
+    .values({ id: 1, purposeGoals, purposeGoalsSample: false })
+    .onConflictDoUpdate({ target: schema.settings.id, set: { purposeGoals, purposeGoalsSample: false } });
+  revalidatePath("/settings");
+  revalidatePath("/dashboard");
   return { ok: true };
 }
 
