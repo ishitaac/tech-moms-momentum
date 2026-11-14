@@ -41,9 +41,15 @@ High-contrast theme: darker muted text (10:1), visible card borders, darker teal
 - Keyboard: Tab order follows the page, every stop shows a focus ring, the drawer takes focus and closes on Escape.
 - `npm run typecheck`, `npm run lint`, `npm test`, `npm run build` all pass.
 
-## Unresolved (not color-related, pre-existing)
+## Follow-up fixes (not color-related)
 
-1. **Funder row buttons** (`action-buttons.tsx`): visible text isn't part of the accessible name (WCAG 2.5.3 Label in Name), e.g. visible "Add to pipeline" vs. name "Add Maxar Foundation to pipeline". Fix: name like "Add to pipeline: Maxar Foundation".
-2. **Pipeline cards** (`pipeline-board.tsx`): the draggable card wrapper (`role="button"`) contains buttons and selects (axe `nested-interactive`). Needs a structural change to the drag handle.
-3. Stage colors in `globals.css` (`.stage-*`) are hard-coded hex; they're decorative (stage names are text) so the high-contrast theme doesn't recolor them.
-4. Not tested with real screen readers or real users with color-vision deficiencies.
+- **Label in Name (WCAG 2.5.3):** funder row buttons (`action-buttons.tsx`, `funder-table.tsx`, `saved-table.tsx`) keep their visible text as the start of the accessible name, with the funder name added as screen-reader-only text (e.g. "Add to pipeline: Maxar Foundation").
+- **Nested interactive (pipeline cards):** the draggable role, tab stop and drag instructions moved from the whole card to the grip handle (`pipeline-board.tsx`, `pipeline-card.tsx`). Mouse drag still works anywhere on the card; keyboard users focus the grip and press Space. The stage dropdown remains the non-drag alternative.
+
+After these, axe reports 0 violations on every page in both themes.
+
+## Unresolved
+
+1. Stage colors in `globals.css` (`.stage-*`) are hard-coded hex; they are decorative (stage names are text) so the high-contrast theme does not recolor them.
+2. After a keyboard drag, focus is not returned to the grip automatically.
+3. Not tested with real screen readers or with users with color-vision deficiencies.
