@@ -6,6 +6,7 @@ import { db, schema } from "@/db";
 import { isEnabled } from "@/config/flags";
 import { ORG_PROFILE } from "@/config/org-profile";
 import { getModel, isAiConfigured, modelId, UsageMeter } from "@/lib/ai/provider";
+import { getCurrentUser, SIGNED_OUT_MESSAGE } from "@/lib/auth/session";
 
 const MAX_DRAFT_CHARS = 20_000;
 const DRAFT_TOKEN_CAP = 20_000;
@@ -21,6 +22,7 @@ export interface DraftState {
 }
 
 export async function getDraft(funderId: number): Promise<DraftState | null> {
+  if (!(await getCurrentUser())) return null;
   if (!Number.isInteger(funderId)) return null;
   const [d] = await db.select().from(schema.drafts).where(eq(schema.drafts.funderId, funderId)).orderBy(desc(schema.drafts.updatedAt)).limit(1);
   if (!d) return null;
@@ -29,6 +31,7 @@ export async function getDraft(funderId: number): Promise<DraftState | null> {
 
 /** Only runs when the user clicks "Draft starting point". Off unless FLAG_AI_DRAFT=true. */
 export async function generateDraft(funderId: number): Promise<{ ok: true; draft: DraftState } | { ok: false; error: string }> {
+  if (!(await getCurrentUser())) return { ok: false, error: SIGNED_OUT_MESSAGE };
   if (!isEnabled("aiDraft")) return { ok: false, error: "AI drafts are turned off." };
   if (!isAiConfigured()) return { ok: false, error: "No AI key configured." };
   const [funder] = await db.select().from(schema.funders).where(eq(schema.funders.id, funderId));
@@ -63,6 +66,7 @@ export async function generateDraft(funderId: number): Promise<{ ok: true; draft
 }
 
 export async function saveDraft(funderId: number, body: string): Promise<{ ok: boolean }> {
+  if (!(await getCurrentUser())) return { ok: false };
   if (!Number.isInteger(funderId) || body.length > MAX_DRAFT_CHARS) return { ok: false };
   const [d] = await db.select({ id: schema.drafts.id }).from(schema.drafts).where(eq(schema.drafts.funderId, funderId)).orderBy(desc(schema.drafts.updatedAt)).limit(1);
   if (!d) return { ok: false };

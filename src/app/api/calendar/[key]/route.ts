@@ -1,3 +1,4 @@
+import { apiUserOrResponse } from "@/lib/auth/session";
 import { buildIcs } from "@/lib/ics";
 import { upcomingDeadlines, type DeadlineRow } from "@/lib/pipeline-queries";
 
@@ -12,8 +13,10 @@ const toEvent = (d: DeadlineRow) => ({
   url: d.link.startsWith("http") ? d.link : undefined,
 });
 
-/** GET /api/calendar/all → every upcoming deadline; /api/calendar/p12 or /o34 → one. */
+/** GET /api/calendar/all → every upcoming deadline; /api/calendar/p12 or /o34 → one. Signed-in staff only. */
 export async function GET(_req: Request, ctx: RouteContext<"/api/calendar/[key]">) {
+  const user = await apiUserOrResponse();
+  if (user instanceof Response) return user;
   const { key } = await ctx.params;
   if (!VALID_KEY.test(key)) return new Response("Not found", { status: 404 });
 

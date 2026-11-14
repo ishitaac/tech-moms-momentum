@@ -7,6 +7,7 @@ import { db, schema } from "@/db";
 import { BellIcon, CalendarIcon, DoorIcon, SparkleIcon } from "@/components/icons";
 import { MarkAllRead } from "@/components/notifications/mark-all-read";
 import { BTN, CARD, PageHeader, Pill } from "@/components/ui";
+import { requireUser } from "@/lib/auth/session";
 
 const LIMIT = 100;
 
@@ -18,6 +19,7 @@ const KIND = {
 } as const;
 
 async function List() {
+  await requireUser();
   await connection();
   const rows = await db.select().from(schema.notifications).orderBy(desc(schema.notifications.createdAt)).limit(LIMIT);
   const unread = rows.filter((r) => !r.readAt).length;

@@ -1,4 +1,5 @@
 import {
+  bigint,
   boolean,
   date,
   integer,
@@ -9,6 +10,7 @@ import {
   serial,
   text,
   timestamp,
+  uniqueIndex,
 } from "drizzle-orm/pg-core";
 
 export const funderType = pgEnum("funder_type", [
@@ -201,4 +203,116 @@ export const drafts = pgTable("drafts", {
   body: text("body").notNull(),
   sourceMaterial: jsonb("source_material").notNull(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+});
+
+/* ---------- Authentication (Better Auth). Staff accounts only: never donor, student or volunteer data. ---------- */
+
+export const userRole = pgEnum("user_role", ["admin", "staff"]);
+const authTs = (name: string) => timestamp(name, { withTimezone: true }).defaultNow().notNull();
+
+export const authUsers = pgTable("auth_user", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  email: text("email").notNull().unique(),
+  emailVerified: boolean("email_verified").default(false).notNull(),
+  image: text("image"),
+  /** Server-assigned only (Better Auth `input: false`); never accepted from a client request. */
+  role: userRole("role").default("staff").notNull(),
+  createdAt: authTs("created_at"),
+  updatedAt: authTs("updated_at"),
+});
+
+export const authSessions = pgTable("auth_session", {
+  id: text("id").primaryKey(),
+  expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+  token: text("token").notNull().unique(),
+  ipAddress: text("ip_address"),
+  userAgent: text("user_agent"),
+  userId: text("user_id").references(() => authUsers.id, { onDelete: "cascade" }).notNull(),
+  createdAt: authTs("created_at"),
+  updatedAt: authTs("updated_at"),
+});
+
+export const authAccounts = pgTable("auth_account", {
+  id: text("id").primaryKey(),
+  accountId: text("account_id").notNull(),
+  providerId: text("provider_id").notNull(),
+  userId: text("user_id").references(() => authUsers.id, { onDelete: "cascade" }).notNull(),
+  accessToken: text("access_token"),
+  refreshToken: text("refresh_token"),
+  idToken: text("id_token"),
+  accessTokenExpiresAt: timestamp("access_token_expires_at", { withTimezone: true }),
+  refreshTokenExpiresAt: timestamp("refresh_token_expires_at", { withTimezone: true }),
+  scope: text("scope"),
+  /** Hash produced by Better Auth (scrypt). The app never hashes or compares passwords itself. */
+  password: text("password"),
+  createdAt: authTs("created_at"),
+  updatedAt: authTs("updated_at"),
+});
+
+export const authVerifications = pgTable("auth_verification", {
+  id: text("id").primaryKey(),
+  identifier: text("identifier").notNull(),
+  value: text("value").notNull(),
+  expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+  createdAt: authTs("created_at"),
+  updatedAt: authTs("updated_at"),
+});
+
+/** Sign-in / reset rate limits shared across server instances. */
+export const authRateLimits = pgTable("auth_rate_limit", {
+  id: text("id").primaryKey(),
+  key: text("key").notNull().unique(),
+  count: integer("count").notNull(),
+  lastRequest: bigint("last_request", { mode: "number" }).notNull(),
+});
+
+/* ---------- Human approval of AI-generated content (separate from funder approve/snooze/reject decisions) ---------- */
+
+export const approvalStatus = pgEnum("approval_status", ["draft", "pending_approval", "approved", "changes_requested", "rejected"]);
+
+export const contentApprovals = pgTable(
+  "content_approvals",
+  {
+    id: serial("id").primaryKey(),
+    /** The AI draft this was created from. One approval item per draft row. */
+    draftId: integer("draft_id").references(() => drafts.id, { onDelete: "set null" }),
+    funderId: integer("funder_id").references(() => funders.id, { onDelete: "cascade" }).notNull(),
+    contentType: text("content_type").notNull(),
+    title: text("title").notNull(),
+    subject: text("subject").default("").notNull(),
+    body: text("body").notNull(),
+    sourceMaterial: jsonb("source_material").$type<string[]>().default([]).notNull(),
+    factsToVerify: jsonb("facts_to_verify").$type<string[]>().default([]).notNull(),
+    status: approvalStatus("status").default("draft").notNull(),
+    /** Bumped on every content edit; reviews must name the version they read. */
+    version: integer("version").default(1).notNull(),
+    contentHash: text("content_hash").notNull(),
+    createdById: text("created_by_id").references(() => authUsers.id, { onDelete: "set null" }),
+    submittedById: text("submitted_by_id").references(() => authUsers.id, { onDelete: "set null" }),
+    submittedAt: timestamp("submitted_at", { withTimezone: true }),
+    reviewedById: text("reviewed_by_id").references(() => authUsers.id, { onDelete: "set null" }),
+    reviewedAt: timestamp("reviewed_at", { withTimezone: true }),
+    reviewNotes: text("review_notes"),
+    /** Hash + version of the exact text that was approved. Cleared when the content changes. */
+    approvedHash: text("approved_hash"),
+    approvedVersion: integer("approved_version"),
+    createdAt: createdAt(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (t) => [uniqueIndex("content_approvals_draft_id_unique").on(t.draftId)],
+);
+
+/** Append-only audit trail: who did what, to which version, when. */
+export const approvalEvents = pgTable("approval_events", {
+  id: serial("id").primaryKey(),
+  approvalId: integer("approval_id").references(() => contentApprovals.id, { onDelete: "cascade" }).notNull(),
+  action: text("action").notNull(),
+  fromStatus: approvalStatus("from_status"),
+  toStatus: approvalStatus("to_status"),
+  actorId: text("actor_id").references(() => authUsers.id, { onDelete: "set null" }),
+  notes: text("notes"),
+  version: integer("version").notNull(),
+  contentHash: text("content_hash").notNull(),
+  createdAt: createdAt(),
 });

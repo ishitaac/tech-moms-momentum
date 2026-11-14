@@ -1,8 +1,10 @@
 import { Suspense } from "react";
 import { PipelineBoard } from "@/components/pipeline/pipeline-board";
 import { pipelineCards } from "@/lib/pipeline-queries";
+import { requireUser } from "@/lib/auth/session";
 
 async function Board() {
+  await requireUser();
   const cards = await pipelineCards();
   return <PipelineBoard initialCards={cards} />;
 }

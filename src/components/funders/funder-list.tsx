@@ -8,11 +8,13 @@ import { CARD, StatCard, usd } from "@/components/ui";
 import { Filters } from "./filters";
 import { FunderTable } from "./funder-table";
 import { TrustBanner } from "./trust-banner";
+import { requireUser } from "@/lib/auth/session";
 
 const MAX_ROWS = 300;
 const DEADLINE_SOON_DAYS = 14;
 
 export async function FunderList({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
+  await requireUser();
   const params = await searchParams;
   const filters = parseFilters(params);
   const [{ rows, refresh }, cards, deadlines] = await Promise.all([rankedRows(), pipelineCards(), upcomingDeadlines()]);

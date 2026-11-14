@@ -12,6 +12,7 @@ import { RefreshButton, ClearSampleButton } from "@/components/settings/settings
 import { WeightSliders } from "@/components/settings/weight-sliders";
 import { Card, PageHeader, SourceLink } from "@/components/ui";
 import type { SourceError } from "@/lib/sources/types";
+import { requireUser } from "@/lib/auth/session";
 
 const USAGE_ROWS = 8;
 
@@ -33,6 +34,7 @@ function Panel({ title, children, id }: { title: string; children: React.ReactNo
 }
 
 async function Settings() {
+  await requireUser();
   await connection();
   const [settings] = await db.select().from(schema.settings).limit(1);
   const refreshes = await db.select().from(schema.refreshes).orderBy(desc(schema.refreshes.id)).limit(USAGE_ROWS);

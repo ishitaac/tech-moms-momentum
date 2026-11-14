@@ -5,11 +5,13 @@ import { FundingHealth } from "@/components/reports/funding-health";
 import { FunderStrategy } from "@/components/reports/funder-strategy";
 import { ReportTabs } from "@/components/reports/tabs";
 import { parseTab } from "@/lib/reports-model";
+import { requireUser } from "@/lib/auth/session";
 
 const SKELETON = <div className="h-96 animate-pulse rounded-[16px] bg-card" />;
 
 /** The selected sub-tab is read from ?tab= (a runtime value), so this sits behind Suspense. */
 async function ReportsBody({ searchParams }: Pick<PageProps<"/dashboard">, "searchParams">) {
+  await requireUser();
   const tab = parseTab((await searchParams).tab);
   return (
     <>
