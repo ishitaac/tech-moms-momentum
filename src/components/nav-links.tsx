@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { BellIcon, CloseIcon, DashboardIcon, FundersIcon, MenuIcon, PipelineIcon, SettingsIcon } from "./icons";
+import { BellIcon, BookmarkIcon, CloseIcon, DashboardIcon, FundersIcon, MenuIcon, PipelineIcon, SettingsIcon } from "./icons";
 
 const GROUPS = [
   { title: "Discover", links: [{ href: "/", label: "Funders", Icon: FundersIcon }] },
@@ -12,6 +12,7 @@ const GROUPS = [
     title: "Manage",
     links: [
       { href: "/pipeline", label: "Pipeline", Icon: PipelineIcon },
+      { href: "/saved", label: "Saved for Later", Icon: BookmarkIcon },
       { href: "/dashboard", label: "Dashboard", Icon: DashboardIcon },
     ],
   },

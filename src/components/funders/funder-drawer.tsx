@@ -179,7 +179,15 @@ export function FunderDrawer({ row, onClose, showPeople, showDraft }: Props) {
           </dl>
 
           {!row.excludedReason && (
-            <ActionButtons funderId={row.funderId} opportunityId={row.opportunityId} funderName={row.name} onResult={setMessage} className="mt-5" />
+            <ActionButtons
+              funderId={row.funderId}
+              opportunityId={row.opportunityId}
+              funderName={row.name}
+              onResult={setMessage}
+              className="mt-5"
+              saved={row.decision === "snooze"}
+              inPipeline={row.decision === "approve"}
+            />
           )}
           <p role="status" aria-live="polite" className={message ? "mt-3 rounded-full bg-teal-tint px-4 py-2 text-body text-plum" : "sr-only"}>
             {message}

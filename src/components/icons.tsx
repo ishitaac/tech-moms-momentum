@@ -23,6 +23,11 @@ export const PipelineIcon = (p: P) => (
     <rect x="17" y="4" width="4" height="13" rx="1.5" />
   </Icon>
 );
+export const BookmarkIcon = (p: P) => (
+  <Icon {...p}>
+    <path d="M6 3h12v18l-6-4.5L6 21V3z" />
+  </Icon>
+);
 export const DashboardIcon = (p: P) => (
   <Icon {...p}>
     <path d="M4 20V10M10 20V4M16 20v-7M22 20H2" />
