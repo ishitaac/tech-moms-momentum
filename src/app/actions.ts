@@ -53,6 +53,25 @@ export async function decide(input: z.infer<typeof decisionSchema>): Promise<Act
   }
   revalidatePath("/");
   revalidatePath("/pipeline");
+  revalidatePath("/saved");
+  return { ok: true };
+}
+
+/**
+ * Remove from saved: deletes ONLY this funder's "snooze" rows from decisions. The funder, its scores, its
+ * pipeline items and its approve/reject decisions are never touched, so whatever state the funder had
+ * before it was saved (for example "In your pipeline") comes back.
+ */
+export async function unsaveFunder(funderId: number): Promise<ActionResult> {
+  if (!Number.isInteger(funderId) || funderId <= 0) return fail("Invalid funder");
+  try {
+    await db.delete(schema.decisions).where(and(eq(schema.decisions.funderId, funderId), eq(schema.decisions.action, "snooze")));
+  } catch (err) {
+    console.error("unsaveFunder failed", err);
+    return fail("Could not remove it from Saved for Later. Please try again.");
+  }
+  revalidatePath("/");
+  revalidatePath("/saved");
   return { ok: true };
 }
 
