@@ -74,7 +74,14 @@ export function FunderTable({ rows, totalMatching, isExcludedView, showPeople, s
                         </button>
                       </div>
                     ) : (
-                      <ActionButtons funderId={r.funderId} opportunityId={r.opportunityId} funderName={r.name} onResult={setNotice}>
+                      <ActionButtons
+                        key={`${r.scoreId}-${r.decision}`}
+                        funderId={r.funderId}
+                        opportunityId={r.opportunityId}
+                        funderName={r.name}
+                        onResult={setNotice}
+                        saved={r.decision === "snooze"}
+                      >
                         <button type="button" onClick={() => setSelected(r)} className="text-sm font-medium text-plum underline decoration-plum/40 underline-offset-4 hover:decoration-plum" aria-label={`View details for ${r.name}`}>
                           View details
                         </button>
