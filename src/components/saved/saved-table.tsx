@@ -103,8 +103,8 @@ export function SavedTable({ rows, today, showPeople, showDraft }: Props) {
                       saved
                       hideSavedTag
                     >
-                      <button type="button" onClick={() => setSelected(r)} className={LINK} aria-label={`View details for ${r.name}`}>
-                        View details
+                      <button type="button" onClick={() => setSelected(r)} className={LINK}>
+                        View details<span className="sr-only"> for {r.name}</span>
                       </button>
                     </ActionButtons>
                   </div>

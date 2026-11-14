@@ -38,9 +38,9 @@ export function Filters({ filters, location, excludedCount, updated }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [q]);
 
-  const select = "rounded-full border border-line bg-card px-4 py-2.5 text-body text-plum";
+  const select = "rounded-full border border-control bg-card px-4 py-2.5 text-body text-plum";
   const view = (active: boolean) =>
-    `rounded-full px-3 py-1 text-sm ${active ? "bg-plum-tint font-semibold text-plum" : "text-muted hover:text-plum"}`;
+    `rounded-full px-3 py-1 text-sm ${active ? "bg-plum-tint font-semibold text-plum underline decoration-2 underline-offset-4" : "text-muted hover:text-plum"}`;
 
   return (
     <div className="space-y-3">
@@ -53,7 +53,7 @@ export function Filters({ filters, location, excludedCount, updated }: Props) {
             aria-label="Search funders"
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            className="w-full rounded-full border border-line bg-card py-2.5 pl-11 pr-4 text-body text-plum placeholder:text-muted"
+            className="w-full rounded-full border border-control bg-card py-2.5 pl-11 pr-4 text-body text-plum placeholder:text-muted"
           />
         </div>
         <select aria-label="Funder type" className={select} value={filters.type ?? ""} onChange={(e) => set("type", e.target.value || null)}>

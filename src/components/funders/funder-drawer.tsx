@@ -7,7 +7,7 @@ import type { FunderDetail, ListRow } from "@/lib/queries";
 import { CloseIcon } from "@/components/icons";
 import { BandBadge, OpenCallBadge, ScoreBadge, SourceLink, shortDate, softenCaps, typeLabel, usd } from "@/components/ui";
 import { ActionButtons, NotAFitButton } from "./action-buttons";
-import { DraftPanel } from "./draft-panel";
+import { OutreachPanel } from "./outreach-panel";
 
 interface Props {
   row: ListRow;
@@ -226,7 +226,7 @@ export function FunderDrawer({ row, onClose, showPeople, showDraft }: Props) {
                     <li key={k} className="flex items-center gap-3">
                       <span className="w-40 shrink-0 text-sm">{COMPONENT_LABELS[k]}</span>
                       <span className="h-2 flex-1 overflow-hidden rounded-full bg-plum-tint">
-                        {c.score !== null && <span className="block h-full rounded-full bg-teal" style={{ width: `${c.score * 100}%` }} />}
+                        {c.score !== null && <span className="block h-full rounded-full bg-teal-strong" style={{ width: `${c.score * 100}%` }} />}
                       </span>
                       <span className="w-16 text-right text-sm text-muted">{c.score === null ? "Unknown" : `${Math.round(c.score * 100)}%`}</span>
                     </li>
@@ -301,7 +301,7 @@ export function FunderDrawer({ row, onClose, showPeople, showDraft }: Props) {
             <p className="text-sm text-muted">Everything here comes from public information.</p>
           </Section>
 
-          {showDraft && <DraftPanel funderId={row.funderId} funderName={row.name} />}
+          {showDraft && <OutreachPanel funderId={row.funderId} opportunityId={row.opportunityId} />}
 
           {!row.excludedReason && (
             <div className="mt-6 flex items-center gap-2 border-t border-line pt-5 text-sm text-muted">

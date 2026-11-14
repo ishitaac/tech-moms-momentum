@@ -7,6 +7,7 @@ import { STAGES, stageTotal, type PipelineCard, type Stage } from "@/lib/pipelin
 import { CheckIcon, CoinsIcon, InfoIcon, PipelineIcon } from "@/components/icons";
 import { usd } from "@/components/ui";
 import { KpiTile } from "./kpi-tile";
+import type { DraggableAttributes } from "@dnd-kit/core";
 import { PipelineCardView } from "./pipeline-card";
 import { STAGE_NAME } from "./stage-names";
 
@@ -106,7 +107,7 @@ function Column({
       <div className="space-y-3">
         {cards.map((c) => (
           <Draggable key={c.id} id={c.id}>
-            <PipelineCardView card={c} onStageChange={onStageChange} onChange={onCardChange} />
+            {(dragAttributes) => <PipelineCardView card={c} onStageChange={onStageChange} onChange={onCardChange} dragAttributes={dragAttributes} />}
           </Draggable>
         ))}
         {cards.length === 0 && (
@@ -117,12 +118,17 @@ function Column({
   );
 }
 
-function Draggable({ id, children }: { id: number; children: React.ReactNode }) {
+/**
+ * Pointer listeners stay on the whole card (drag from anywhere), but the button role, tab stop and
+ * screen-reader drag instructions live on the grip handle, so the card no longer nests its own
+ * buttons and selects inside another button (axe "nested-interactive").
+ */
+function Draggable({ id, children }: { id: number; children: (dragAttributes: DraggableAttributes) => React.ReactNode }) {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({ id: String(id) });
   const style = transform ? { transform: `translate3d(${transform.x}px, ${transform.y}px, 0)` } : undefined;
   return (
-    <div ref={setNodeRef} style={style} className={`rounded-[12px] ${isDragging ? "relative z-20 rotate-1 scale-[1.03] cursor-grabbing opacity-95 shadow-[0_12px_32px_rgb(75_27_60/0.22)]" : ""}`} {...listeners} {...attributes}>
-      {children}
+    <div ref={setNodeRef} style={style} className={`rounded-[12px] ${isDragging ? "relative z-20 rotate-1 scale-[1.03] cursor-grabbing opacity-95 shadow-[0_12px_32px_rgb(75_27_60/0.22)]" : ""}`} {...listeners}>
+      {children(attributes)}
     </div>
   );
 }

@@ -69,8 +69,8 @@ export function FunderTable({ rows, totalMatching, isExcludedView, showPeople, s
                     ) : inPipeline ? (
                       <div className="flex flex-wrap items-center gap-3">
                         <Pill tone="teal">In your pipeline</Pill>
-                        <button type="button" onClick={() => setSelected(r)} className="text-sm font-medium text-plum underline decoration-plum/40 underline-offset-4 hover:decoration-plum" aria-label={`View details for ${r.name}`}>
-                          View details
+                        <button type="button" onClick={() => setSelected(r)} className="text-sm font-medium text-plum underline decoration-plum/40 underline-offset-4 hover:decoration-plum">
+                          View details<span className="sr-only"> for {r.name}</span>
                         </button>
                       </div>
                     ) : (
@@ -82,8 +82,8 @@ export function FunderTable({ rows, totalMatching, isExcludedView, showPeople, s
                         onResult={setNotice}
                         saved={r.decision === "snooze"}
                       >
-                        <button type="button" onClick={() => setSelected(r)} className="text-sm font-medium text-plum underline decoration-plum/40 underline-offset-4 hover:decoration-plum" aria-label={`View details for ${r.name}`}>
-                          View details
+                        <button type="button" onClick={() => setSelected(r)} className="text-sm font-medium text-plum underline decoration-plum/40 underline-offset-4 hover:decoration-plum">
+                          View details<span className="sr-only"> for {r.name}</span>
                         </button>
                       </ActionButtons>
                     )}

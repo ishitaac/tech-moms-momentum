@@ -2,16 +2,20 @@
 
 import { useEffect, useId, useRef, useState, useTransition } from "react";
 import { createPortal } from "react-dom";
+import type { DraggableAttributes } from "@dnd-kit/core";
 import { addPayment, updateAmounts } from "@/app/actions";
 import { GripIcon } from "@/components/icons";
 import { STAGES, type PipelineCard, type Stage } from "@/lib/pipeline-model";
 import { shortDate, typeLabel, usd } from "@/components/ui";
 import { NEXT_ACTION, STAGE_NAME } from "./stage-names";
+import { PipelineDraftAction } from "./pipeline-draft-modal";
 
 interface Props {
   card: PipelineCard;
   onStageChange: (id: number, stage: Stage) => void;
   onChange: (c: PipelineCard) => void;
+  /** Keyboard/screen-reader drag handle (the grip). Mouse drag still works on the whole card. */
+  dragAttributes?: DraggableAttributes;
 }
 
 /** Stops drag listeners from hijacking clicks/typing inside the card's controls. */
@@ -28,7 +32,7 @@ const TYPE_PILL: Record<string, string> = {
 const POPOVER_WIDTH = 288;
 const money = (n: number | null) => (n ? usd(n) : "-");
 
-export function PipelineCardView({ card, onStageChange, onChange }: Props) {
+export function PipelineCardView({ card, onStageChange, onChange, dragAttributes }: Props) {
   const [editing, setEditing] = useState(false);
   const [pos, setPos] = useState<{ top: number; left: number }>({ top: 0, left: 0 });
   const [asked, setAsked] = useState(card.amountAsked?.toString() ?? "");
@@ -98,7 +102,7 @@ export function PipelineCardView({ card, onStageChange, onChange }: Props) {
       onChange({ ...card, received: card.received + amount });
     });
 
-  const input = "mt-1 w-full rounded-full border border-line bg-card px-3 py-2 text-body text-plum";
+  const input = "mt-1 w-full rounded-full border border-control bg-card px-3 py-2 text-body text-plum";
   const isAwarded = card.stage === "awarded";
   const isDeclined = card.stage === "declined";
 
@@ -106,10 +110,21 @@ export function PipelineCardView({ card, onStageChange, onChange }: Props) {
     <article
       className={`group cursor-grab rounded-[12px] border p-3 shadow-card transition duration-150 hover:-translate-y-0.5 hover:shadow-card-hover active:cursor-grabbing ${
         isDeclined ? "border-line bg-[#faf7f9]" : "border-line bg-card"
-      } ${isAwarded ? "border-l-4 border-l-teal-logo" : ""}`}
+      } ${isAwarded ? "border-l-4 border-l-teal-strong" : ""}`}
     >
       <div className="flex items-start gap-1.5">
-        <GripIcon className="mt-0.5 h-4 w-4 shrink-0 text-muted/70 group-hover:text-plum" />
+        {dragAttributes ? (
+          <button
+            type="button"
+            {...dragAttributes}
+            aria-label={`Drag ${card.funderName} to another stage`}
+            className="-m-1 shrink-0 rounded p-1 text-muted/70 hover:text-plum group-hover:text-plum"
+          >
+            <GripIcon className="h-4 w-4" />
+          </button>
+        ) : (
+          <GripIcon className="mt-0.5 h-4 w-4 shrink-0 text-muted/70 group-hover:text-plum" />
+        )}
         <div className="min-w-0 flex-1">
           <p className={`text-[16px] font-semibold leading-snug ${isDeclined ? "text-muted" : "text-plum"}`} title={card.funderName}>
             {card.funderName}
@@ -174,7 +189,7 @@ export function PipelineCardView({ card, onStageChange, onChange }: Props) {
           id={`stage-${card.id}`}
           value={card.stage}
           onChange={(e) => onStageChange(card.id, e.target.value as Stage)}
-          className="w-full rounded-full border border-line bg-card py-2 pl-3 pr-2 text-sm font-medium text-plum"
+          className="w-full rounded-full border border-control bg-card py-2 pl-3 pr-2 text-sm font-medium text-plum"
         >
           {STAGES.map((s) => (
             <option key={s} value={s}>
@@ -183,6 +198,8 @@ export function PipelineCardView({ card, onStageChange, onChange }: Props) {
           ))}
         </select>
       </div>
+
+      <PipelineDraftAction card={card} />
 
       {editing &&
         createPortal(
