@@ -12,7 +12,7 @@ const GROUPS = [
     title: "Manage",
     links: [
       { href: "/pipeline", label: "Pipeline", Icon: PipelineIcon },
-      { href: "/dashboard", label: "Dashboard", Icon: DashboardIcon },
+      { href: "/dashboard", label: "Reporting", Icon: DashboardIcon },
     ],
   },
   {
