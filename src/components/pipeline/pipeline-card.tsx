@@ -8,6 +8,7 @@ import { GripIcon } from "@/components/icons";
 import { STAGES, type PipelineCard, type Stage } from "@/lib/pipeline-model";
 import { shortDate, typeLabel, usd } from "@/components/ui";
 import { NEXT_ACTION, STAGE_NAME } from "./stage-names";
+import { PipelineDraftAction } from "./pipeline-draft-modal";
 
 interface Props {
   card: PipelineCard;
@@ -197,6 +198,8 @@ export function PipelineCardView({ card, onStageChange, onChange, dragAttributes
           ))}
         </select>
       </div>
+
+      <PipelineDraftAction card={card} />
 
       {editing &&
         createPortal(
