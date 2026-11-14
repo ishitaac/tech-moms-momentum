@@ -21,8 +21,18 @@ npm run db:start                  # terminal 1: real Postgres on :5433 (embedded
 npm run db:push                   # create tables
 npm run db:seed                   # settings, corporate seeds, SAMPLE pipeline data
 npm run ingest -- all             # load 990 snapshot + Grants.gov + score (~3 min, no AI)
-npm run dev                       # terminal 2: http://localhost:3000
+npm run auth:create-user -- --email you@tech-moms.org --name "Your Name" --role admin   # first account (prints a temporary password)
+npm run dev                       # terminal 2: http://localhost:3000 → sign in
 ```
+
+## Sign-in, roles and approvals
+
+- **Sign-in is required** for every page and API except `/login`, `/forgot-password`, `/reset-password`, `/api/auth/*` (Better Auth) and `/api/cron/*` (its own `CRON_SECRET`).
+- **No public sign-up.** An admin creates accounts: `npm run auth:create-user -- --email … --name "…" --role admin|staff` (password from `AUTH_NEW_USER_PASSWORD`, or a random one printed once). Change a role with `--set-role staff`.
+- **Roles:** `staff` create, edit and submit AI drafts. `admin` also approves / requests changes / rejects (never their own content), changes Settings, runs "Refresh now" and clears sample data.
+- **Password reset** emails a 30-minute, single-use link via Resend (`RESEND_API_KEY`). Without a key, `npm run dev` prints the link in the server console; production logs nothing.
+- **Approvals** (`/approvals`): AI drafts move Draft → Pending approval → Approved / Changes requested / Rejected. Editing approved content removes the approval. Every step is recorded with the person, time, version and content hash. Approval never sends anything; "Open in my email app" is a separate confirmed step and is never offered for `[DEMO]` / `Sample` funders.
+- Auth env vars: `BETTER_AUTH_SECRET` (required in production; `openssl rand -base64 32`), `BETTER_AUTH_URL` (public URL, used in reset links). See `.env.example`.
 
 Prefer Docker? `docker compose up -d` also serves Postgres on :5433 with the same credentials.
 

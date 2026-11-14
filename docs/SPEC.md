@@ -23,7 +23,7 @@ Open items go in [`BACKLOG.md`](../BACKLOG.md), not here.
 | Charts | Recharts | |
 | Kanban | `@dnd-kit/core` | Select-to-move fallback for accessibility |
 | Tests | Vitest, **core logic only** | Gates, scoring, bands, confidence, 990 parsing, ICS. Deliberate hackathon exception to the 80% rule |
-| Auth | None (single-tenant demo) | Add shared-password gate if deployed publicly — see backlog |
+| Auth | Better Auth (email + password, Drizzle/Postgres) | No public sign-up; roles `admin` / `staff`; sessions 12 h. Proxy = optimistic cookie redirect; every page, server action and API re-validates the session (`src/lib/auth/session.ts`) |
 
 ## 2. Architecture
 
@@ -74,6 +74,9 @@ Registered in `src/config/sources.ts` (enable/disable per source).
 | `refreshes` | id, started_at, finished_at, funders_seen, funders_processed, funders_skipped_cached, tokens_in, tokens_out, est_cost_usd, source_errors (jsonb) |
 | `settings` | singleton: notify_email, alert_kinds, reminder_days (default [14,7,2]), snooze_days (default 30), token_cap_per_refresh, weights override (jsonb) |
 | `drafts` | id, funder_id, body, source_material (jsonb), updated_at — US-10, flagged |
+| `auth_user` / `auth_session` / `auth_account` / `auth_verification` / `auth_rate_limit` | Better Auth tables. `auth_user.role` (`admin`,`staff`). Staff accounts only; passwords are Better Auth scrypt hashes |
+| `content_approvals` | id, draft_id (unique), funder_id, content_type, title, subject, body, source_material, facts_to_verify, status (`draft`,`pending_approval`,`approved`,`changes_requested`,`rejected`), version, content_hash, created/submitted/reviewed by + at, review_notes, approved_hash, approved_version |
+| `approval_events` | append-only audit: approval_id, action, from/to status, actor_id, notes, version, content_hash, created_at |
 
 Privacy: no table stores donor, student or staff personal data. `people` holds only officer/trustee names + titles already published in filings.
 
@@ -163,6 +166,7 @@ Status as of end of pre-build (2026-11-13). 94 unit tests passing (`npm test`), 
 - [x] 8. Notifications page, Resend email, deadline reminders, ICS export (`/api/calendar/all`), Settings + AI usage panel
 - [x] 9. Cron refresh route `/api/cron/refresh` (daily check, runs every 14 days, token cap) + `vercel.json`
 - [x] 10. Flagged stretch built: board members, AI draft, full dashboard, weight tuning (all off by default)
+- [x] 10b. Sign-in (Better Auth, admin/staff, password reset, protected pages + APIs + server actions), human approval of AI drafts (`/approvals`), Tech-Moms website link — unit tests + browser-tested end to end
 - [ ] 11. Demo prep: decide flags + AI key (BACKLOG #1, #17), fill `org-profile.ts`, Candid spot-check validation, rehearse
 - [ ] 12. Hosting (team, after hackathon — BACKLOG #19)
 
