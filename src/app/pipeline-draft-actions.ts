@@ -16,6 +16,7 @@ import {
 } from "@/lib/pipeline-draft";
 import { STAGE_NAME } from "@/components/pipeline/stage-names";
 import { usd } from "@/components/ui";
+import { requireUser } from "@/lib/auth/session";
 
 /** Gemini can stall under high demand; fail with a friendly message instead of hanging the modal. */
 const GEMINI_TIMEOUT_MS = 60_000;
@@ -29,11 +30,13 @@ export interface PipelineDraftResult {
 }
 
 export async function isPipelineDraftConfigured(): Promise<boolean> {
+  await requireUser("app:use");
   return getGeminiModel().ok;
 }
 
 /** Runs only when the user clicks Generate. Drafts only — never sends or submits anything. */
 export async function generatePipelineDraft(pipelineItemId: number, rawInput: unknown): Promise<Result<PipelineDraftResult>> {
+  await requireUser("draft:generate");
   if (!Number.isInteger(pipelineItemId)) return { ok: false, error: "Pipeline card not found." };
   const parsed = pipelineDraftInputSchema.safeParse(rawInput);
   if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? "Please check your inputs." };
@@ -80,20 +83,26 @@ export async function generatePipelineDraft(pipelineItemId: number, rawInput: un
   }
 }
 
-/** Saves the human-edited draft to the existing drafts table (no schema change). */
-export async function savePipelineDraft(pipelineItemId: number, rawDraft: unknown): Promise<Result<null>> {
+/** Saves the human-edited draft to the existing drafts table. Returns its id so it can be submitted for approval. */
+export async function savePipelineDraft(pipelineItemId: number, rawDraft: unknown): Promise<Result<{ draftId: number }>> {
+  const user = await requireUser("draft:edit");
   if (!Number.isInteger(pipelineItemId)) return { ok: false, error: "Pipeline card not found." };
   const parsed = pipelineDraftSchema.safeParse(rawDraft);
   if (!parsed.success) return { ok: false, error: "Draft is too long to save." };
   try {
     const [item] = await db.select({ funderId: schema.pipelineItems.funderId }).from(schema.pipelineItems).where(eq(schema.pipelineItems.id, pipelineItemId));
     if (!item) return { ok: false, error: "Pipeline card not found." };
-    await db.insert(schema.drafts).values({
-      funderId: item.funderId,
-      body: parsed.data.body,
-      sourceMaterial: { kind: "pipeline", pipelineItemId, ...parsed.data },
-    });
-    return { ok: true, data: null };
+    const [row] = await db
+      .insert(schema.drafts)
+      .values({
+        funderId: item.funderId,
+        body: parsed.data.body,
+        sourceMaterial: { kind: "pipeline", pipelineItemId, ...parsed.data },
+        createdBy: user.id,
+      })
+      .returning({ id: schema.drafts.id });
+    if (!row) return { ok: false, error: "Could not save. Try again." };
+    return { ok: true, data: { draftId: row.id } };
   } catch (err) {
     console.error("pipeline draft save failed", err);
     return { ok: false, error: "Could not save. Try again." };

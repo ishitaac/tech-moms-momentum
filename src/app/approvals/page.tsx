@@ -62,7 +62,7 @@ async function Queue({ searchParams }: Pick<PageProps<"/approvals">, "searchPara
           </span>
           <h2 className="mt-5 text-section font-semibold text-plum">{status === "pending_approval" ? "Nothing is waiting for approval." : "Nothing here yet."}</h2>
           <p className="mt-2 max-w-sm text-body text-muted">
-            AI drafts appear here after someone saves one and chooses “Submit for approval” in a funder’s outreach assistant.
+            AI drafts appear here after someone saves one and chooses “Submit for approval” — in a funder’s outreach assistant or on a pipeline card.
           </p>
           <Link href="/" className={`${BTN.primary} mt-6`}>
             Go to funders

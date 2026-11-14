@@ -36,6 +36,7 @@ export const ACTION_LABEL: Record<ReviewAction, string> = {
 export const CONTENT_TYPE_LABEL: Record<string, string> = {
   grant_draft: "Grant proposal draft",
   outreach: "Funder outreach",
+  pipeline: "Pipeline outreach / LOI",
 };
 
 export const MAX_NOTE_CHARS = 2_000;
@@ -93,14 +94,15 @@ export function canSend(status: ReviewStatus | null | undefined, approvedHash: s
   return status === "approved" && !!approvedHash && approvedHash === contentHash(currentBody);
 }
 
-/** "grant_draft" vs "outreach", from the shape the two existing draft flows store in drafts.source_material. */
-export function contentTypeOf(sourceMaterial: unknown): "grant_draft" | "outreach" {
-  return sourceMaterial && typeof sourceMaterial === "object" && (sourceMaterial as { kind?: unknown }).kind === "outreach" ? "outreach" : "grant_draft";
+/** Content type from the `kind` each existing draft flow stores in drafts.source_material (grant drafts have none). */
+export function contentTypeOf(sourceMaterial: unknown): "grant_draft" | "outreach" | "pipeline" {
+  const kind = sourceMaterial && typeof sourceMaterial === "object" ? (sourceMaterial as { kind?: unknown }).kind : null;
+  return kind === "outreach" || kind === "pipeline" ? kind : "grant_draft";
 }
 
 export function titleFor(contentType: string, funderName: string, sourceMaterial: unknown): string {
   const subject = sourceMaterial && typeof sourceMaterial === "object" ? (sourceMaterial as { subject?: unknown }).subject : null;
-  if (contentType === "outreach" && typeof subject === "string" && subject.trim()) return `${subject.trim().slice(0, 120)} — ${funderName}`;
+  if ((contentType === "outreach" || contentType === "pipeline") && typeof subject === "string" && subject.trim()) return `${subject.trim().slice(0, 120)} — ${funderName}`;
   return `${CONTENT_TYPE_LABEL[contentType] ?? "Draft"} — ${funderName}`;
 }
 

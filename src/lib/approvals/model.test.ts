@@ -63,11 +63,13 @@ describe("canSend (no unapproved external sending)", () => {
 describe("content type and title from existing draft records", () => {
   it("recognises outreach vs grant drafts", () => {
     expect(contentTypeOf({ kind: "outreach" })).toBe("outreach");
+    expect(contentTypeOf({ kind: "pipeline", pipelineItemId: 3 })).toBe("pipeline");
     expect(contentTypeOf({ orgFacts: {}, funderFacts: [] })).toBe("grant_draft");
     expect(contentTypeOf(null)).toBe("grant_draft");
   });
   it("uses the outreach subject when present", () => {
     expect(titleFor("outreach", "Acme Fdn", { subject: "Hello" })).toBe("Hello — Acme Fdn");
+    expect(titleFor("pipeline", "Acme Fdn", { subject: "LOI" })).toBe("LOI — Acme Fdn");
     expect(titleFor("grant_draft", "Acme Fdn", {})).toBe("Grant proposal draft — Acme Fdn");
   });
 });

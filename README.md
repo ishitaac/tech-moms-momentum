@@ -42,7 +42,7 @@ Roles: **Admin** approves AI content and manages the team. **Staff** generates, 
 
 Password reset emails go through Resend (`RESEND_API_KEY`). Without a key in local dev, the reset link is printed to the server console. In production nothing is sent.
 
-**Human approval:** after saving an AI outreach draft, choose **Submit for approval**. Admins review it under **Approvals**: approve, request changes (note required) or reject (note required). Each decision records the reviewer, the time and a hash of the exact text. Any material edit clears the approval. Approval never sends anything. "Open approved draft in email" only appears for approved, unchanged text, asks for confirmation first, and the person still presses Send in their own mail app.
+**Human approval:** after saving an AI draft (funder outreach assistant or a pipeline card), choose **Submit for approval**. Admins review it under **Approvals**: approve, request changes (note required) or reject (note required). Each decision records the reviewer, the time and a hash of the exact text. Any material edit clears the approval. Approval never sends anything. "Open approved draft in email" only appears for approved, unchanged text, asks for confirmation first, and the person still presses Send in their own mail app.
 
 Run the approval database tests against a local DB (never production): `TEST_DATABASE_URL=postgres://… npx vitest run src/lib/approvals`.
 
