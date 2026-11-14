@@ -1,9 +1,10 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState, useTransition } from "react";
+import { createApprovalFromDraft } from "@/app/approval-actions";
 import { generateOutreachDraft, getOutreachContext, saveOutreachDraft, type OutreachContext } from "@/app/outreach-actions";
 import {
-  buildMailtoHref,
   DRAFT_ACTION_LABELS,
   DRAFT_TYPE_LABELS,
   MAX_AMOUNT_CHARS,
@@ -23,7 +24,7 @@ const labelClass = "mb-1 block text-xs font-semibold text-plum";
 const secondaryButton =
   "rounded-full border border-plum/30 bg-card px-3 py-1.5 text-sm font-semibold text-plum hover:bg-rose-tint disabled:opacity-60";
 
-/** Gemini Outreach Assistant: drafts only on click; a human edits, copies, and sends. Never sends email. */
+/** Gemini Outreach Assistant: drafts only on click; a human edits, then submits it for approval. Never sends email. */
 export function OutreachPanel({ funderId, opportunityId }: Props) {
   const [context, setContext] = useState<OutreachContext | null>(null);
   const [purpose, setPurpose] = useState("");
@@ -32,6 +33,7 @@ export function OutreachPanel({ funderId, opportunityId }: Props) {
   const [draft, setDraft] = useState<OutreachDraft | null>(null);
   const [sources, setSources] = useState<string[]>([]);
   const [status, setStatus] = useState<string | null>(null);
+  const [approvalId, setApprovalId] = useState<number | null>(null);
   const [pending, start] = useTransition();
 
   useEffect(() => {
@@ -73,6 +75,23 @@ export function OutreachPanel({ funderId, opportunityId }: Props) {
       }
     });
 
+  /** Saves this exact text as a draft, then sends it to the Approvals queue. Nothing is sent to the funder. */
+  const submitForApproval = () =>
+    start(async () => {
+      if (!draft) return;
+      setApprovalId(null);
+      try {
+        const saved = await saveOutreachDraft(funderId, draft);
+        if (!saved.ok) return setStatus(saved.error);
+        const r = await createApprovalFromDraft({ draftId: saved.data.draftId, submit: true });
+        if (!r.ok) return setStatus(r.error);
+        setApprovalId(r.data.id);
+        setStatus("Submitted for approval. An admin reviews it before anyone uses it.");
+      } catch {
+        setStatus("Could not submit. Try again.");
+      }
+    });
+
   const copy = async () => {
     if (!draft) return;
     try {
@@ -89,7 +108,7 @@ export function OutreachPanel({ funderId, opportunityId }: Props) {
     <details className="mt-4 rounded-lg border border-dashed border-rose/40 bg-rose-tint/40 p-3">
       <summary className="cursor-pointer text-xs font-semibold uppercase tracking-wide text-plum">Gemini Outreach Assistant</summary>
       <div className="mt-3 space-y-3">
-        <p className="text-xs text-muted">AI draft. Check every fact before sending.</p>
+        <p className="text-xs text-muted">AI draft. An admin must approve it before it&apos;s used. Check every fact.</p>
 
         {!context ? (
           !status && <p className="text-xs text-muted">Loading…</p>
@@ -158,12 +177,12 @@ export function OutreachPanel({ funderId, opportunityId }: Props) {
               </ul>
             </details>
             <div className="flex flex-wrap items-center gap-2">
-              <button onClick={copy} className="rounded-full bg-plum px-3 py-1.5 text-sm font-semibold text-white">
+              <button onClick={copy} className={secondaryButton}>
                 Copy draft
               </button>
-              <a href={buildMailtoHref(draft.subject, draft.body)} className={secondaryButton}>
-                Open in email
-              </a>
+              <button onClick={submitForApproval} disabled={pending || !draft.body.trim()} className="rounded-full bg-plum px-3 py-1.5 text-sm font-semibold text-white disabled:opacity-60">
+                Submit for approval
+              </button>
               <button onClick={save} disabled={pending} className={secondaryButton}>
                 Save draft
               </button>
@@ -174,6 +193,14 @@ export function OutreachPanel({ funderId, opportunityId }: Props) {
         {status && (
           <p className="text-xs text-plum" role="status" aria-live="polite">
             {status}
+            {approvalId && (
+              <>
+                {" "}
+                <Link href={`/approvals/${approvalId}`} className="font-semibold underline underline-offset-2">
+                  View in Approvals
+                </Link>
+              </>
+            )}
           </p>
         )}
       </div>
