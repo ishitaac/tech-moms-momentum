@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import { PageHeader } from "@/components/ui";
 import { ActionCenter } from "@/components/reports/action-center";
 import { FundingHealth } from "@/components/reports/funding-health";
-import { Panel } from "@/components/reports/panel";
+import { FunderStrategy } from "@/components/reports/funder-strategy";
 import { ReportTabs } from "@/components/reports/tabs";
 import { parseTab } from "@/lib/reports-model";
 
@@ -15,11 +15,7 @@ async function ReportsBody({ searchParams }: Pick<PageProps<"/dashboard">, "sear
     <>
       <ReportTabs active={tab} />
       {tab === "funding-health" && <FundingHealth />}
-      {tab === "funder-strategy" && (
-        <Panel title="Funder Strategy">
-          <p className="py-6 text-center text-sm text-muted">Coming in a later step.</p>
-        </Panel>
-      )}
+      {tab === "funder-strategy" && <FunderStrategy />}
       {tab === "action-center" && <ActionCenter />}
     </>
   );
