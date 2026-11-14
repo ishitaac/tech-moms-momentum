@@ -1,0 +1,470 @@
+[
+  {
+    "ein": "854011010",
+    "name": "A Mothers Foundation",
+    "city": "Salt Lake Cty",
+    "state": "UT",
+    "ntee": "S99",
+    "matchedQuery": "mothers",
+    "keep": null
+  },
+  {
+    "ein": "474048295",
+    "name": "Big Ocean Women",
+    "city": "Spanish Fork",
+    "state": "UT",
+    "ntee": "P20",
+    "matchedQuery": "women",
+    "keep": null
+  },
+  {
+    "ein": "900150022",
+    "name": "Blue Star Mothers Of America Inc",
+    "city": "Magna",
+    "state": "UT",
+    "ntee": null,
+    "matchedQuery": "mothers",
+    "keep": null
+  },
+  {
+    "ein": "872018269",
+    "name": "Bountiful Stem Educational Foundation",
+    "city": "Washington",
+    "state": "UT",
+    "ntee": "B90",
+    "matchedQuery": "stem",
+    "keep": null
+  },
+  {
+    "ein": "814396375",
+    "name": "Carden Memorial Foundation",
+    "city": "Salt Lake Cty",
+    "state": "UT",
+    "ntee": "B50",
+    "matchedQuery": "career",
+    "keep": null
+  },
+  {
+    "ein": "842180811",
+    "name": "Career Academy Of Utah",
+    "city": "Salt Lake Cty",
+    "state": "UT",
+    "ntee": "B29",
+    "matchedQuery": "career",
+    "keep": null
+  },
+  {
+    "ein": "472450838",
+    "name": "Coding For A Change",
+    "city": "Provo",
+    "state": "UT",
+    "ntee": "B90",
+    "matchedQuery": "coding",
+    "keep": null
+  },
+  {
+    "ein": "870455882",
+    "name": "Community Careers & Support Services",
+    "city": "Richfield",
+    "state": "UT",
+    "ntee": null,
+    "matchedQuery": "career",
+    "keep": null
+  },
+  {
+    "ein": "833704955",
+    "name": "Davis Discovery Stem Club",
+    "city": "Roy",
+    "state": "UT",
+    "ntee": "O50",
+    "matchedQuery": "stem",
+    "keep": null
+  },
+  {
+    "ein": "393684798",
+    "name": "Digital Childhood Institute",
+    "city": "Salt Lake City",
+    "state": "UT",
+    "ntee": "B05",
+    "matchedQuery": "digital",
+    "keep": null
+  },
+  {
+    "ein": "932176678",
+    "name": "Digital Citizenship Foundation",
+    "city": "Vineyard",
+    "state": "UT",
+    "ntee": "B90",
+    "matchedQuery": "digital",
+    "keep": null
+  },
+  {
+    "ein": "134368864",
+    "name": "Digital Patient Education Foundatio",
+    "city": "Provo",
+    "state": "UT",
+    "ntee": null,
+    "matchedQuery": "digital",
+    "keep": null
+  },
+  {
+    "ein": "844612052",
+    "name": "Duke For Women Organization",
+    "city": "Washington",
+    "state": "UT",
+    "ntee": "P20",
+    "matchedQuery": "women",
+    "keep": null
+  },
+  {
+    "ein": "843359438",
+    "name": "Educate A Mother",
+    "city": "North Ogden",
+    "state": "UT",
+    "ntee": "P80",
+    "matchedQuery": "mothers",
+    "keep": null
+  },
+  {
+    "ein": "833533837",
+    "name": "Elect Women Utah",
+    "city": "Salt Lake Cty",
+    "state": "UT",
+    "ntee": "W24",
+    "matchedQuery": "women",
+    "keep": null
+  },
+  {
+    "ein": "465550366",
+    "name": "Epik Deliberate Digital",
+    "city": "Salt Lake City",
+    "state": "UT",
+    "ntee": "B90",
+    "matchedQuery": "digital",
+    "keep": null
+  },
+  {
+    "ein": "881078607",
+    "name": "Extra Step",
+    "city": "Salt Lake City",
+    "state": "UT",
+    "ntee": "B12",
+    "matchedQuery": "stem",
+    "keep": null
+  },
+  {
+    "ein": "876128323",
+    "name": "Family Career And Community Leaders Of America Inc",
+    "city": "Salem",
+    "state": "UT",
+    "ntee": null,
+    "matchedQuery": "career",
+    "keep": null
+  },
+  {
+    "ein": "474628374",
+    "name": "Knights Of Columbus",
+    "city": "Draper",
+    "state": "UT",
+    "ntee": null,
+    "matchedQuery": "mothers",
+    "keep": null
+  },
+  {
+    "ein": "422027123",
+    "name": "Love Like A Mother",
+    "city": "Sandy",
+    "state": "UT",
+    "ntee": "P62",
+    "matchedQuery": "mothers",
+    "keep": null
+  },
+  {
+    "ein": "414666091",
+    "name": "Moriba Career Center",
+    "city": "Murray",
+    "state": "UT",
+    "ntee": "B30",
+    "matchedQuery": "career",
+    "keep": null
+  },
+  {
+    "ein": "352400730",
+    "name": "Mormon Women Project",
+    "city": "Provo",
+    "state": "UT",
+    "ntee": "P20",
+    "matchedQuery": "women",
+    "keep": null
+  },
+  {
+    "ein": "472395865",
+    "name": "Mothers Everywhere",
+    "city": "Salt Lake Cty",
+    "state": "UT",
+    "ntee": "P20",
+    "matchedQuery": "mothers",
+    "keep": null
+  },
+  {
+    "ein": "934186175",
+    "name": "Orchard Stem School",
+    "city": "Santaquin",
+    "state": "UT",
+    "ntee": "B20",
+    "matchedQuery": "stem",
+    "keep": null
+  },
+  {
+    "ein": "870660144",
+    "name": "Pta Utah Congress",
+    "city": "Salt Lake Cty",
+    "state": "UT",
+    "ntee": "B942",
+    "matchedQuery": "stem",
+    "keep": null
+  },
+  {
+    "ein": "870551540",
+    "name": "Pta Utah Congress",
+    "city": "Slc",
+    "state": "UT",
+    "ntee": null,
+    "matchedQuery": "stem",
+    "keep": null
+  },
+  {
+    "ein": "870503906",
+    "name": "Salt Lake Mothers Of Twins Club",
+    "city": "Clinton",
+    "state": "UT",
+    "ntee": "P40",
+    "matchedQuery": "mothers",
+    "keep": null
+  },
+  {
+    "ein": "412855507",
+    "name": "Soturi Women Inc",
+    "city": "Pleasant Grv",
+    "state": "UT",
+    "ntee": "P40",
+    "matchedQuery": "women",
+    "keep": null
+  },
+  {
+    "ein": "422197905",
+    "name": "Stem Literacy Foundation",
+    "city": "Vineyard",
+    "state": "UT",
+    "ntee": "B12",
+    "matchedQuery": "stem",
+    "keep": null
+  },
+  {
+    "ein": "813473564",
+    "name": "Stem Partners Foundation Inc",
+    "city": "Salt Lake City",
+    "state": "UT",
+    "ntee": "B12",
+    "matchedQuery": "stem",
+    "keep": null
+  },
+  {
+    "ein": "933797172",
+    "name": "Strong Women",
+    "city": "West Valley",
+    "state": "UT",
+    "ntee": "P84",
+    "matchedQuery": "women",
+    "keep": null
+  },
+  {
+    "ein": "863417178",
+    "name": "Tech-moms",
+    "city": "Bountiful",
+    "state": "UT",
+    "ntee": "B60",
+    "matchedQuery": "self",
+    "keep": true
+  },
+  {
+    "ein": "825503652",
+    "name": "The Archie Eugene And Annie Sims Jones Carter Educational",
+    "city": "Santa Clara",
+    "state": "UT",
+    "ntee": "B82",
+    "matchedQuery": "career",
+    "keep": null
+  },
+  {
+    "ein": "262547317",
+    "name": "Today S First Step Inc A Foundation For Spinal Cord Injuries",
+    "city": "Saint George",
+    "state": "UT",
+    "ntee": "P99",
+    "matchedQuery": "stem",
+    "keep": null
+  },
+  {
+    "ein": "850605959",
+    "name": "United Micronesian Women",
+    "city": "Salt Lake Cty",
+    "state": "UT",
+    "ntee": null,
+    "matchedQuery": "women",
+    "keep": null
+  },
+  {
+    "ein": "870302142",
+    "name": "Utah Association For Career And Technical Education",
+    "city": "Ogden",
+    "state": "UT",
+    "ntee": null,
+    "matchedQuery": "career",
+    "keep": null
+  },
+  {
+    "ein": "883007476",
+    "name": "Utah Blockchain And Digital Innovation Outreach Foundation",
+    "city": "Draper",
+    "state": "UT",
+    "ntee": "S30",
+    "matchedQuery": "digital",
+    "keep": null
+  },
+  {
+    "ein": "823130702",
+    "name": "Utah Career Development Association",
+    "city": "Draper",
+    "state": "UT",
+    "ntee": "B03",
+    "matchedQuery": "career",
+    "keep": null
+  },
+  {
+    "ein": "462398951",
+    "name": "Utah Career Path High",
+    "city": "Kaysville",
+    "state": "UT",
+    "ntee": "B29",
+    "matchedQuery": "career",
+    "keep": null
+  },
+  {
+    "ein": "811653005",
+    "name": "Utah Digital Entertainment Network",
+    "city": "Sandy",
+    "state": "UT",
+    "ntee": "S40",
+    "matchedQuery": "digital",
+    "keep": null
+  },
+  {
+    "ein": "931730682",
+    "name": "Utah Digital Repeater Network",
+    "city": "Lehi",
+    "state": "UT",
+    "ntee": "B90",
+    "matchedQuery": "digital",
+    "keep": null
+  },
+  {
+    "ein": "813451795",
+    "name": "Utah Stem Foundation Inc",
+    "city": "South Salt Lake City",
+    "state": "UT",
+    "ntee": "B90",
+    "matchedQuery": "stem",
+    "keep": null
+  },
+  {
+    "ein": "815202024",
+    "name": "Utah Women Unite",
+    "city": "N Salt Lake",
+    "state": "UT",
+    "ntee": null,
+    "matchedQuery": "women",
+    "keep": null
+  },
+  {
+    "ein": "934574799",
+    "name": "Utah Workforce Housing Advocacy",
+    "city": "Salt Lake Cty",
+    "state": "UT",
+    "ntee": "S19",
+    "matchedQuery": "workforce",
+    "keep": null
+  },
+  {
+    "ein": "471125958",
+    "name": "Women In Architecture",
+    "city": "Salt Lake Cty",
+    "state": "UT",
+    "ntee": "B03",
+    "matchedQuery": "women",
+    "keep": null
+  },
+  {
+    "ein": "933110484",
+    "name": "Women In Construction",
+    "city": "West Jordan",
+    "state": "UT",
+    "ntee": "J01",
+    "matchedQuery": "women",
+    "keep": null
+  },
+  {
+    "ein": "364823627",
+    "name": "Women In Motion",
+    "city": "West Point",
+    "state": "UT",
+    "ntee": "B60",
+    "matchedQuery": "women",
+    "keep": null
+  },
+  {
+    "ein": "822774214",
+    "name": "Women Ride",
+    "city": "Saint George",
+    "state": "UT",
+    "ntee": null,
+    "matchedQuery": "women",
+    "keep": null
+  },
+  {
+    "ein": "261181602",
+    "name": "Women Tech Council",
+    "city": "Salt Lake City",
+    "state": "UT",
+    "ntee": "S41",
+    "matchedQuery": "women tech",
+    "keep": null
+  },
+  {
+    "ein": "464856136",
+    "name": "Women To Women",
+    "city": "Farmington",
+    "state": "UT",
+    "ntee": "P80",
+    "matchedQuery": "women",
+    "keep": null
+  },
+  {
+    "ein": "921583295",
+    "name": "Women To Women Informed Health",
+    "city": "Salem",
+    "state": "UT",
+    "ntee": "B90",
+    "matchedQuery": "women",
+    "keep": null
+  },
+  {
+    "ein": "473951929",
+    "name": "Your Next Step Foundation Inc",
+    "city": "Saint George",
+    "state": "UT",
+    "ntee": "P20",
+    "matchedQuery": "stem",
+    "keep": null
+  }
+]

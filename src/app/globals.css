@@ -1,0 +1,141 @@
+@import "tailwindcss";
+
+/*
+ * Tech-Moms design tokens — the ONE place brand values live.
+ * Contrast (WCAG AA): plum on white 14:1, plum on teal 6.0:1, plum on rose tint ~12:1, muted on white 7:1.
+ * Teal (#43bec4) and rose (#c46c84) are too light for small text on white: use them as fills,
+ * borders, dots and chart colors, with plum text on top. Never white text on teal.
+ */
+:root {
+  --plum: #4b1d42;
+  --teal: #43bec4;
+  --teal-logo: #43bec4;
+  --rose: #c46c84;
+
+  --plum-tint: #f6f0f5;
+  --teal-tint: #e8f7f8;
+  --rose-tint: #f9edf1;
+
+  --page: #faf8f8; /* warm off-white page background */
+  --card: #ffffff;
+  --border: #e9e0e5; /* soft 1px border */
+  --muted: #6b5262; /* secondary text, 7:1 on white */
+
+  --radius-card: 16px;
+  --shadow-card: 0 1px 2px rgb(75 29 66 / 0.04);
+}
+
+@theme inline {
+  --color-plum: var(--plum);
+  --color-teal: var(--teal);
+  --color-teal-logo: var(--teal-logo);
+  --color-rose: var(--rose);
+  --color-plum-tint: var(--plum-tint);
+  --color-teal-tint: var(--teal-tint);
+  --color-rose-tint: var(--rose-tint);
+  --color-page: var(--page);
+  --color-card: var(--card);
+  --color-line: var(--border);
+  --color-muted: var(--muted);
+
+  /* Legacy names kept so existing components keep working while they are restyled. */
+  --color-ink: var(--plum);
+  --color-canvas: var(--page);
+  --color-brand: var(--plum);
+  --color-brand-dark: var(--plum);
+  --color-brand-soft: var(--plum-tint);
+  --color-rose-soft: var(--rose-tint);
+  --color-teal-soft: var(--teal-tint);
+  --color-strong: var(--plum);
+  --color-strong-soft: var(--teal-tint);
+  --color-worth: var(--plum);
+  --color-worth-soft: var(--rose-tint);
+  --color-long: var(--muted);
+  --color-long-soft: var(--plum-tint);
+
+  --radius-card: var(--radius-card);
+  --shadow-card: var(--shadow-card);
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+}
+
+body {
+  background: var(--page);
+  color: var(--plum);
+  font-family: var(--font-sans);
+}
+
+/* One family (Inter). Headings are semibold plum; in a layer so utility classes can still override. */
+@layer base {
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-sans);
+    font-weight: 600;
+    color: var(--plum);
+    letter-spacing: -0.01em;
+  }
+}
+
+:focus-visible {
+  outline: 3px solid var(--plum);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 2px var(--teal);
+  border-radius: 6px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/*
+ * Pipeline / board tokens (shared theme; only the Funding pipeline page uses them for now).
+ * Scale: page title 28 · column title 16 · card name 15 · body 14 · meta 12 (floor).
+ * Spacing follows an 8px grid (8, 16, 24, 32, 40).
+ */
+@theme {
+  --text-display: 2rem;
+  --text-display--line-height: 2.5rem;
+  --text-section: 1.125rem;
+  --text-section--line-height: 1.75rem;
+  --text-title: 1.75rem;
+  --text-title--line-height: 2.25rem;
+  --text-col: 1rem;
+  --text-col--line-height: 1.5rem;
+  --text-cardname: 0.9375rem;
+  --text-cardname--line-height: 1.375rem;
+  --text-body: 0.9375rem;
+  --text-body--line-height: 1.5rem;
+  --text-meta: 0.75rem;
+  --text-meta--line-height: 1rem;
+
+  --radius-card-sm: 12px;
+  --radius-pill: 9999px;
+  --shadow-card-hover: 0 4px 16px rgb(75 29 66 / 0.08);
+}
+
+/* Stage colors: tinted header bar + dot. Text on them is always plum. */
+.stage-prospect {
+  --stage-bg: #f6f0f5;
+  --stage-dot: #4b1d42;
+}
+.stage-loi {
+  --stage-bg: #e8f7f8;
+  --stage-dot: #43bec4;
+}
+.stage-submitted {
+  --stage-bg: #f9edf1;
+  --stage-dot: #c46c84;
+}
+.stage-awarded {
+  --stage-bg: #d5eff1;
+  --stage-dot: #43bec4;
+}
+.stage-declined {
+  --stage-bg: #f3eef1;
+  --stage-dot: #6b5262;
+}
