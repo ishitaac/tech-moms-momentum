@@ -1,8 +1,9 @@
 import { Fragment } from "react";
 import { CalendarIcon, ClockIcon, CoinsIcon, DoorIcon } from "@/components/icons";
-import { Pill, StatCard, usd } from "@/components/ui";
+import { Pill, usd } from "@/components/ui";
 import { actionCenter, CALENDAR_WINDOW_DAYS, daysUntil, hasSampleData, NOT_RECORDED, type ActionGroup, type ActionRow } from "@/lib/reports-model";
 import { reportData } from "@/lib/reports-queries";
+import { KpiCard, KpiGrid } from "./kpi-card";
 import { Panel, SampleNote } from "./panel";
 
 const GROUP_LABEL: Record<ActionGroup, string> = {
@@ -40,12 +41,12 @@ export async function ActionCenter() {
     <div className="space-y-6">
       <SampleNote show={sample} />
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard label="Applications Due Soon" value={kpis.applicationsDueSoon} hint="application deadlines, next 30 days" icon={<CalendarIcon />} tone="rose" />
-        <StatCard label="Payments Pending" value={kpis.paymentsPendingCount} hint={`${usd(kpis.paymentsPendingBalance)} outstanding`} icon={<CoinsIcon />} tone="plum" />
-        <StatCard label="Open Calls Not Yet in Pipeline" value={kpis.openCallsNotInPipeline} hint="open, with no pipeline item" icon={<DoorIcon />} tone="teal" />
-        <StatCard label="Awarded Funding Still Outstanding" value={kpis.awardedOutstanding === null ? NOT_RECORDED : usd(kpis.awardedOutstanding)} hint="balance left on awards" icon={<ClockIcon />} tone="teal" />
-      </div>
+      <KpiGrid count={4}>
+        <KpiCard label="Applications Due Soon" value={kpis.applicationsDueSoon} hint="application deadlines, next 30 days" icon={<CalendarIcon />} tone="rose" />
+        <KpiCard label="Payments Pending" value={kpis.paymentsPendingCount} hint={`${usd(kpis.paymentsPendingBalance)} outstanding`} icon={<CoinsIcon />} tone="plum" />
+        <KpiCard label="Open Calls Not Yet in Pipeline" value={kpis.openCallsNotInPipeline} hint="open, with no pipeline item" icon={<DoorIcon />} tone="teal" />
+        <KpiCard label="Awarded Funding Still Outstanding" value={kpis.awardedOutstanding === null ? NOT_RECORDED : usd(kpis.awardedOutstanding)} hint="balance left on awards" icon={<ClockIcon />} tone="teal" />
+      </KpiGrid>
 
       {kpis.awardedMissingAmount > 0 && (
         <p role="note" className="text-xs text-muted">
