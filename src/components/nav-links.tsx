@@ -4,8 +4,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { BellIcon, BookmarkIcon, CloseIcon, DashboardIcon, FundersIcon, MenuIcon, PipelineIcon, SettingsIcon } from "./icons";
+import { ApprovalIcon, BellIcon, BookmarkIcon, CloseIcon, DashboardIcon, FundersIcon, MenuIcon, PipelineIcon, SettingsIcon, UsersIcon } from "./icons";
 import { ThemeToggle } from "./theme-toggle";
+import { AccountFooter, type NavUser } from "./account-footer";
 
 const GROUPS = [
   { title: "Discover", links: [{ href: "/", label: "Funders", Icon: FundersIcon }] },
@@ -15,6 +16,7 @@ const GROUPS = [
       { href: "/pipeline", label: "Pipeline", Icon: PipelineIcon },
       { href: "/saved", label: "Saved for Later", Icon: BookmarkIcon },
       { href: "/dashboard", label: "Reports", Icon: DashboardIcon },
+      { href: "/approvals", label: "Approvals", Icon: ApprovalIcon },
     ],
   },
   {
@@ -22,12 +24,13 @@ const GROUPS = [
     links: [
       { href: "/notifications", label: "Notifications", Icon: BellIcon },
       { href: "/settings", label: "Settings", Icon: SettingsIcon },
+      { href: "/team", label: "Team access", Icon: UsersIcon, adminOnly: true },
     ],
   },
 ];
 
 /** Left sidebar on desktop; on phones a top bar with a menu button that opens the same list. */
-export function Sidebar({ unread }: { unread: number }) {
+export function Sidebar({ unread, pendingApprovals = 0, user }: { unread: number; pendingApprovals?: number; user: NavUser }) {
   const path = usePathname();
   // Menu is "open for this path": navigating to another page closes it without an effect.
   const [openFor, setOpenFor] = useState<string | null>(null);
@@ -64,7 +67,7 @@ export function Sidebar({ unread }: { unread: number }) {
       {open && <button type="button" aria-label="Close menu" className="fixed inset-0 z-30 bg-plum/30 lg:hidden" onClick={() => setOpenFor(null)} />}
 
       <aside
-        className={`fixed inset-y-0 left-0 z-40 w-64 flex-col border-r border-line bg-card px-4 py-6 lg:sticky lg:top-0 lg:z-auto lg:flex lg:h-screen lg:shrink-0 ${open ? "flex" : "hidden"}`}
+        className={`fixed inset-y-0 left-0 z-40 w-64 flex-col overflow-y-auto border-r border-line bg-card px-4 py-6 lg:sticky lg:top-0 lg:z-auto lg:flex lg:h-screen lg:shrink-0 ${open ? "flex" : "hidden"}`}
       >
         <Link href="/" className="mb-8 hidden items-center gap-3 px-4 lg:flex">
           <Image src="/tech-moms-logo.png" alt="Tech-Moms" width={88} height={52} priority />
@@ -74,7 +77,7 @@ export function Sidebar({ unread }: { unread: number }) {
             <div key={g.title}>
               <p className="mb-2 px-4 text-xs font-medium tracking-wider text-muted">{g.title.toUpperCase()}</p>
               <div className="flex flex-col gap-1">
-                {g.links.map(({ href, label, Icon }) => {
+                {g.links.filter((l) => !("adminOnly" in l && l.adminOnly) || user.canManageUsers).map(({ href, label, Icon }) => {
                   const active = href === "/" ? path === "/" || path === "/excluded" : path.startsWith(href);
                   return (
                     <Link
@@ -95,6 +98,14 @@ export function Sidebar({ unread }: { unread: number }) {
                           {unread}
                         </span>
                       )}
+                      {href === "/approvals" && pendingApprovals > 0 && (
+                        <span
+                          className={`rounded-full px-2 py-0.5 text-xs font-semibold ${active ? "bg-white text-plum" : "border border-teal bg-teal-tint text-plum"}`}
+                          aria-label={`${pendingApprovals} pending approval`}
+                        >
+                          {pendingApprovals}
+                        </span>
+                      )}
                     </Link>
                   );
                 })}
@@ -102,10 +113,9 @@ export function Sidebar({ unread }: { unread: number }) {
             </div>
           ))}
         </nav>
-        <div className="mt-auto space-y-3">
+        <AccountFooter user={user}>
           <ThemeToggle />
-          <p className="px-4 text-xs leading-relaxed text-muted">Built from public information. You make every decision.</p>
-        </div>
+        </AccountFooter>
       </aside>
     </>
   );
