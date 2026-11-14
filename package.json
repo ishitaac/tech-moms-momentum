@@ -12,6 +12,7 @@
     "typecheck": "tsc --noEmit",
     "db:push": "drizzle-kit push",
     "db:seed": "tsx --env-file=.env.local scripts/seed.ts",
+    "db:seed-demo": "tsx --env-file=.env.local scripts/seed-demo.ts",
     "ingest": "tsx --env-file=.env.local scripts/ingest/index.ts",
     "db:start": "tsx scripts/db-start.ts"
   },
