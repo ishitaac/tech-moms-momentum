@@ -6,7 +6,7 @@ import { Suspense } from "react";
 import { db, schema } from "@/db";
 import { BellIcon, CalendarIcon, DoorIcon, SparkleIcon } from "@/components/icons";
 import { MarkAllRead } from "@/components/notifications/mark-all-read";
-import { BTN, CARD, PageHeader } from "@/components/ui";
+import { BTN, CARD, PageHeader, Pill } from "@/components/ui";
 
 const LIMIT = 100;
 
@@ -48,13 +48,17 @@ async function List() {
           const { Icon, chip, action } = KIND[n.kind];
           const external = n.link?.startsWith("http");
           return (
-            <li key={n.id} className={`${CARD} flex items-start gap-4 p-5 ${n.readAt ? "" : "border-l-4 border-l-teal"}`}>
+            <li key={n.id} className={`${CARD} flex items-start gap-4 p-5 ${n.readAt ? "" : "border-l-4 border-l-teal-strong"}`}>
               <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-plum ${chip}`}>
                 <Icon className="h-5 w-5" />
               </span>
               <div className="min-w-0 flex-1">
                 <h3 className="text-[16px] font-semibold leading-snug text-plum">
-                  {!n.readAt && <span className="sr-only">New: </span>}
+                  {!n.readAt && (
+                    <Pill tone="teal" className="mr-2 align-middle">
+                      New<span className="sr-only">:</span>
+                    </Pill>
+                  )}
                   {n.title}
                 </h3>
                 {n.body && <p className="mt-1 line-clamp-2 text-body text-muted">{n.body}</p>}

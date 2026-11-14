@@ -74,7 +74,7 @@ export function shortDate(iso: string): string {
 /** Large circular fit score: a ring filled to the score, number inside, band named in text beside/below it. */
 export function ScoreBadge({ total, band, size = "lg" }: { total: number | null; band: string | null; size?: "md" | "lg" }) {
   const dim = size === "lg" ? "h-[72px] w-[72px]" : "h-14 w-14";
-  const color = "#43bec4"; // teal = fit score
+  const color = "var(--teal-strong)"; // fit score ring: 3:1+ against its track in every theme
   const style: CSSProperties = { background: `conic-gradient(${color} ${total ?? 0}%, var(--plum-tint) 0)` };
   return (
     <span
