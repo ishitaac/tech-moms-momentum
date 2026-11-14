@@ -2,8 +2,8 @@
 
 import { useEffect, useState, useTransition } from "react";
 import { generateOutreachDraft, getOutreachContext, saveOutreachDraft, type OutreachContext } from "@/app/outreach-actions";
+import { ApprovalControls } from "@/components/approvals/approval-controls";
 import {
-  buildMailtoHref,
   DRAFT_ACTION_LABELS,
   DRAFT_TYPE_LABELS,
   MAX_AMOUNT_CHARS,
@@ -32,6 +32,8 @@ export function OutreachPanel({ funderId, opportunityId }: Props) {
   const [draft, setDraft] = useState<OutreachDraft | null>(null);
   const [sources, setSources] = useState<string[]>([]);
   const [status, setStatus] = useState<string | null>(null);
+  /** The last saved version (drafts.id + text) — the unit that goes through human approval. */
+  const [saved, setSaved] = useState<{ id: number; subject: string; body: string } | null>(null);
   const [pending, start] = useTransition();
 
   useEffect(() => {
@@ -56,6 +58,7 @@ export function OutreachPanel({ funderId, opportunityId }: Props) {
         if (!r.ok) return setStatus(r.error);
         setDraft(r.data.draft);
         setSources(r.data.sourceMaterial);
+        setSaved(null);
         setStatus(null);
       } catch {
         setStatus("Could not create a draft. Try again later.");
@@ -67,6 +70,7 @@ export function OutreachPanel({ funderId, opportunityId }: Props) {
       if (!draft) return;
       try {
         const r = await saveOutreachDraft(funderId, draft);
+        if (r.ok) setSaved({ id: r.data.draftId, subject: draft.subject, body: draft.body });
         setStatus(r.ok ? "Saved." : r.error);
       } catch {
         setStatus("Could not save. Try again.");
@@ -161,13 +165,20 @@ export function OutreachPanel({ funderId, opportunityId }: Props) {
               <button onClick={copy} className="rounded-full bg-plum px-3 py-1.5 text-sm font-semibold text-white">
                 Copy draft
               </button>
-              <a href={buildMailtoHref(draft.subject, draft.body)} className={secondaryButton}>
-                Open in email
-              </a>
               <button onClick={save} disabled={pending} className={secondaryButton}>
                 Save draft
               </button>
             </div>
+            {saved ? (
+              <ApprovalControls
+                key={saved.id}
+                draftId={saved.id}
+                dirty={saved.subject !== draft.subject || saved.body !== draft.body}
+                offerEmail
+              />
+            ) : (
+              <p className="text-xs text-muted">Save the draft, then submit it for approval. It can be opened in email once an admin approves it.</p>
+            )}
           </div>
         )}
 
