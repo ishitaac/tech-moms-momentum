@@ -3,12 +3,12 @@
 import { useEffect, useId, useRef, useState, useTransition } from "react";
 import { createPortal } from "react-dom";
 import { generatePipelineDraft, isPipelineDraftConfigured, savePipelineDraft } from "@/app/pipeline-draft-actions";
+import { ApprovalControls } from "@/components/approvals/approval-controls";
 import { CloseIcon, SparkleIcon } from "@/components/icons";
 import { BTN, typeLabel } from "@/components/ui";
 import type { PipelineCard } from "@/lib/pipeline-model";
 import { NOT_CONFIGURED_MESSAGE } from "@/lib/outreach";
 import {
-  buildMailtoHref,
   draftTypeForStage,
   MAX_AMOUNT_CHARS,
   MAX_NOTES_CHARS,
@@ -65,6 +65,8 @@ export function PipelineDraftModal({ card, draftType, onClose }: Props) {
   const [draft, setDraft] = useState<PipelineDraft | null>(null);
   const [sources, setSources] = useState<string[]>([]);
   const [status, setStatus] = useState<string | null>(null);
+  /** Last saved version (drafts.id + text): the unit that goes through human approval. */
+  const [saved, setSaved] = useState<{ id: number; subject: string; body: string } | null>(null);
   const [pending, start] = useTransition();
 
   useEffect(() => {
@@ -89,6 +91,7 @@ export function PipelineDraftModal({ card, draftType, onClose }: Props) {
         if (!r.ok) return setStatus(r.error);
         setDraft(r.data.draft);
         setSources(r.data.sourceMaterial);
+        setSaved(null);
         setStatus(null);
       } catch {
         setStatus("Could not create a draft. Try again later.");
@@ -100,6 +103,7 @@ export function PipelineDraftModal({ card, draftType, onClose }: Props) {
       if (!draft) return;
       try {
         const r = await savePipelineDraft(card.id, draft);
+        if (r.ok) setSaved({ id: r.data.draftId, subject: draft.subject, body: draft.body });
         setStatus(r.ok ? "Draft saved." : r.error);
       } catch {
         setStatus("Could not save. Try again.");
@@ -205,8 +209,12 @@ export function PipelineDraftModal({ card, draftType, onClose }: Props) {
                 <button type="button" onClick={generate} disabled={pending || !purpose.trim()} className={BTN.secondary}>Regenerate</button>
                 <button type="button" onClick={copy} className={BTN.primary}>Copy draft</button>
                 <button type="button" onClick={save} disabled={pending} className={BTN.secondary}>Save draft</button>
-                <a href={buildMailtoHref(draft.subject, draft.body)} className={BTN.secondary}>Open in email</a>
               </div>
+              {saved ? (
+                <ApprovalControls key={saved.id} draftId={saved.id} dirty={saved.subject !== draft.subject || saved.body !== draft.body} offerEmail />
+              ) : (
+                <p className="text-sm text-muted">Save the draft, then submit it for approval. It can be opened in email once an admin approves it.</p>
+              )}
             </div>
           )}
         </div>

@@ -1,5 +1,6 @@
 import { buildIcs } from "@/lib/ics";
 import { upcomingDeadlines, type DeadlineRow } from "@/lib/pipeline-queries";
+import { requireApiUser } from "@/lib/auth/session";
 
 const ALL = "all";
 const VALID_KEY = /^(all|[po]\d{1,10})$/;
@@ -13,7 +14,9 @@ const toEvent = (d: DeadlineRow) => ({
 });
 
 /** GET /api/calendar/all → every upcoming deadline; /api/calendar/p12 or /o34 → one. */
-export async function GET(_req: Request, ctx: RouteContext<"/api/calendar/[key]">) {
+export async function GET(req: Request, ctx: RouteContext<"/api/calendar/[key]">) {
+  const user = await requireApiUser(req);
+  if (user instanceof Response) return user;
   const { key } = await ctx.params;
   if (!VALID_KEY.test(key)) return new Response("Not found", { status: 404 });
 

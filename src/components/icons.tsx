@@ -111,3 +111,28 @@ export const SearchIcon = (p: P) => (
     <path d="M20 20l-3.5-3.5" />
   </Icon>
 );
+export const ApprovalIcon = (p: P) => (
+  <Icon {...p}>
+    <path d="M12 3l7 3v5c0 4.5-3 8.2-7 10-4-1.8-7-5.5-7-10V6l7-3z" />
+    <path d="M9 12l2 2 4-4" />
+  </Icon>
+);
+export const ExternalLinkIcon = (p: P) => (
+  <Icon {...p}>
+    <path d="M14 4h6v6M20 4l-9 9" />
+    <path d="M18 14v5a1 1 0 01-1 1H5a1 1 0 01-1-1V7a1 1 0 011-1h5" />
+  </Icon>
+);
+export const UsersIcon = (p: P) => (
+  <Icon {...p}>
+    <circle cx="9" cy="8" r="3.5" />
+    <path d="M2.5 20c.6-3.4 3.2-5.5 6.5-5.5s5.9 2.1 6.5 5.5" />
+    <path d="M16 4.6a3.5 3.5 0 010 6.8M18.5 14.8c1.6.8 2.7 2.6 3 5.2" />
+  </Icon>
+);
+export const LogoutIcon = (p: P) => (
+  <Icon {...p}>
+    <path d="M15 4h3a2 2 0 012 2v12a2 2 0 01-2 2h-3" />
+    <path d="M10 16l-4-4 4-4M6 12h10" />
+  </Icon>
+);

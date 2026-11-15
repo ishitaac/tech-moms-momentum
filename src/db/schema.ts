@@ -9,6 +9,7 @@ import {
   serial,
   text,
   timestamp,
+  uniqueIndex,
 } from "drizzle-orm/pg-core";
 
 export const funderType = pgEnum("funder_type", [
@@ -201,4 +202,101 @@ export const drafts = pgTable("drafts", {
   body: text("body").notNull(),
   sourceMaterial: jsonb("source_material").notNull(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+  /** Signed-in user who generated or saved this draft (null for drafts made before sign-in existed). */
+  createdBy: text("created_by").references(() => authUsers.id, { onDelete: "set null" }),
+});
+
+/* ---------- Authentication (Better Auth; tables named auth_* to stay clear of app data) ---------- */
+
+export const authUsers = pgTable("auth_users", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  email: text("email").notNull().unique(),
+  emailVerified: boolean("email_verified").default(false).notNull(),
+  image: text("image"),
+  /** "admin" or "staff" (Better Auth admin plugin). */
+  role: text("role").default("staff"),
+  banned: boolean("banned").default(false),
+  banReason: text("ban_reason"),
+  banExpires: timestamp("ban_expires", { withTimezone: true }),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+});
+
+export const authSessions = pgTable("auth_sessions", {
+  id: text("id").primaryKey(),
+  expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+  token: text("token").notNull().unique(),
+  ipAddress: text("ip_address"),
+  userAgent: text("user_agent"),
+  userId: text("user_id").references(() => authUsers.id, { onDelete: "cascade" }).notNull(),
+  impersonatedBy: text("impersonated_by"),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+});
+
+export const authAccounts = pgTable("auth_accounts", {
+  id: text("id").primaryKey(),
+  accountId: text("account_id").notNull(),
+  providerId: text("provider_id").notNull(),
+  userId: text("user_id").references(() => authUsers.id, { onDelete: "cascade" }).notNull(),
+  accessToken: text("access_token"),
+  refreshToken: text("refresh_token"),
+  idToken: text("id_token"),
+  accessTokenExpiresAt: timestamp("access_token_expires_at", { withTimezone: true }),
+  refreshTokenExpiresAt: timestamp("refresh_token_expires_at", { withTimezone: true }),
+  scope: text("scope"),
+  /** Hashed by Better Auth (scrypt). Never plain text. */
+  password: text("password"),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+});
+
+export const authVerifications = pgTable("auth_verifications", {
+  id: text("id").primaryKey(),
+  identifier: text("identifier").notNull(),
+  value: text("value").notNull(),
+  expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+});
+
+/* ---------- Human approval of AI-generated content ---------- */
+
+export const reviewStatus = pgEnum("review_status", ["draft", "pending_approval", "approved", "changes_requested", "rejected"]);
+
+/** Current review state of one AI-generated draft. One row per draft (unique), so a draft can't be queued twice. */
+export const contentReviews = pgTable(
+  "content_reviews",
+  {
+    id: serial("id").primaryKey(),
+    draftId: integer("draft_id").references(() => drafts.id, { onDelete: "cascade" }).notNull(),
+    /** "grant_draft" | "outreach" — read from the draft's source material. */
+    contentType: text("content_type").notNull(),
+    title: text("title").notNull(),
+    status: reviewStatus("status").default("draft").notNull(),
+    /** sha256 of the whitespace-normalised body that was submitted / reviewed. */
+    contentHash: text("content_hash").notNull(),
+    submittedBy: text("submitted_by").references(() => authUsers.id, { onDelete: "set null" }),
+    submittedAt: timestamp("submitted_at", { withTimezone: true }),
+    reviewedBy: text("reviewed_by").references(() => authUsers.id, { onDelete: "set null" }),
+    reviewedAt: timestamp("reviewed_at", { withTimezone: true }),
+    reviewNotes: text("review_notes"),
+    createdAt: createdAt(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (t) => [uniqueIndex("content_reviews_draft_id_unique").on(t.draftId)],
+);
+
+/** Append-only audit trail of every review action. */
+export const reviewEvents = pgTable("review_events", {
+  id: serial("id").primaryKey(),
+  reviewId: integer("review_id").references(() => contentReviews.id, { onDelete: "cascade" }).notNull(),
+  action: text("action").notNull(),
+  fromStatus: reviewStatus("from_status"),
+  toStatus: reviewStatus("to_status").notNull(),
+  contentHash: text("content_hash").notNull(),
+  actorId: text("actor_id").references(() => authUsers.id, { onDelete: "set null" }),
+  note: text("note"),
+  createdAt: createdAt(),
 });

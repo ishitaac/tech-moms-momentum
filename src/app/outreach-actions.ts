@@ -5,6 +5,7 @@ import { db, schema } from "@/db";
 import { isEnabled } from "@/config/flags";
 import { getGeminiModel } from "@/lib/ai/gemini";
 import { loadFunderFacts, orgFacts } from "@/lib/outreach-facts";
+import { requireUser } from "@/lib/auth/session";
 import {
   buildSystemPrompt,
   buildUserPrompt,
@@ -36,6 +37,7 @@ function validIds(funderId: unknown, opportunityId: unknown): opportunityId is n
 }
 
 export async function getOutreachContext(funderId: number, opportunityId: number | null): Promise<Result<OutreachContext>> {
+  await requireUser("app:use");
   if (!isEnabled("aiDraft")) return { ok: false, error: "AI drafts are turned off." };
   if (!validIds(funderId, opportunityId)) return { ok: false, error: "Funder not found." };
   const facts = await loadFunderFacts(funderId, opportunityId);
@@ -49,6 +51,7 @@ export async function generateOutreachDraft(
   opportunityId: number | null,
   rawInput: unknown,
 ): Promise<Result<OutreachResult>> {
+  const user = await requireUser("draft:generate");
   if (!isEnabled("aiDraft")) return { ok: false, error: "AI drafts are turned off." };
   if (!validIds(funderId, opportunityId)) return { ok: false, error: "Funder not found." };
 
@@ -79,6 +82,7 @@ export async function generateOutreachDraft(
       funderId,
       body: draft.body,
       sourceMaterial: { kind: "outreach", ...draft, input: parsed.data, sourceMaterial, model: gemini.modelId },
+      createdBy: user.id,
     });
     return { ok: true, data: { draft, sourceMaterial } };
   } catch (err) {
@@ -87,19 +91,25 @@ export async function generateOutreachDraft(
   }
 }
 
-/** Saves the human-edited version as a new row in the existing drafts table (no schema change). */
-export async function saveOutreachDraft(funderId: number, rawDraft: unknown): Promise<Result<null>> {
+/** Saves the human-edited version as a new row in the existing drafts table. Returns its id so it can be submitted for approval. */
+export async function saveOutreachDraft(funderId: number, rawDraft: unknown): Promise<Result<{ draftId: number }>> {
+  const user = await requireUser("draft:edit");
   if (!isEnabled("aiDraft")) return { ok: false, error: "AI drafts are turned off." };
   if (!Number.isInteger(funderId)) return { ok: false, error: "Funder not found." };
   const parsed = outreachDraftSchema.safeParse(rawDraft);
   if (!parsed.success) return { ok: false, error: "Draft is too long to save." };
   try {
-    await db.insert(schema.drafts).values({
-      funderId,
-      body: parsed.data.body,
-      sourceMaterial: { kind: "outreach", editedByUser: true, ...parsed.data },
-    });
-    return { ok: true, data: null };
+    const [row] = await db
+      .insert(schema.drafts)
+      .values({
+        funderId,
+        body: parsed.data.body,
+        sourceMaterial: { kind: "outreach", editedByUser: true, ...parsed.data },
+        createdBy: user.id,
+      })
+      .returning({ id: schema.drafts.id });
+    if (!row) return { ok: false, error: "Could not save. Try again." };
+    return { ok: true, data: { draftId: row.id } };
   } catch (err) {
     console.error("outreach save failed", err);
     return { ok: false, error: "Could not save. Try again." };

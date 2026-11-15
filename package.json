@@ -14,13 +14,15 @@
     "db:seed": "tsx --env-file=.env.local scripts/seed.ts",
     "db:seed-demo": "tsx --env-file=.env.local scripts/seed-demo.ts",
     "ingest": "tsx --env-file=.env.local scripts/ingest/index.ts",
-    "db:start": "tsx scripts/db-start.ts"
+    "db:start": "tsx scripts/db-start.ts",
+    "auth:create-admin": "tsx --env-file=.env.local scripts/create-admin.ts"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^4.0.105",
     "@ai-sdk/google": "^4.0.121",
     "@dnd-kit/core": "^6.3.1",
     "ai": "^7.0.173",
+    "better-auth": "1.7.14",
     "date-fns": "^4.4.0",
     "drizzle-orm": "^0.45.4",
     "fast-xml-parser": "^5.12.1",
